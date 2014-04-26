@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GalaSoft.MvvmLight.Threading;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -60,9 +61,13 @@ namespace Helios
             {
                 // Create a Frame to act as the navigation context and navigate to the first page
                 rootFrame = new Frame();
+                // Set the default language
+                rootFrame.Language = Windows.Globalization.ApplicationLanguages.Languages[0];
 
                 // TODO: change this value to a cache size that is appropriate for your application
                 rootFrame.CacheSize = 1;
+
+                rootFrame.NavigationFailed += OnNavigationFailed;
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
@@ -71,6 +76,7 @@ namespace Helios
 
                 // Place the frame in the current Window
                 Window.Current.Content = rootFrame;
+                DispatcherHelper.Initialize();
             }
 
             if (rootFrame.Content == null)
@@ -126,6 +132,16 @@ namespace Helios
 
             // TODO: Save application state and stop any background activity
             deferral.Complete();
+        }
+
+        /// <summary>
+        /// Invoked when Navigation to a certain page fails
+        /// </summary>
+        /// <param name="sender">The Frame which failed navigation</param>
+        /// <param name="e">Details about the navigation failure</param>
+        void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
+        {
+            throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
         }
     }
 }

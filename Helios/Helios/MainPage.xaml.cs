@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Helios.ViewModel;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=391641
 
@@ -20,8 +21,19 @@ namespace Helios
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainPage : Page
+    public sealed partial class MainPage
     {
+        /// <summary>
+        /// Gets the view's ViewModel.
+        /// </summary>
+        public MainViewModel Vm
+        {
+            get
+            {
+                return (MainViewModel)DataContext;
+            }
+        }
+
         public MainPage()
         {
             this.InitializeComponent();
@@ -43,6 +55,36 @@ namespace Helios
             // Windows.Phone.UI.Input.HardwareButtons.BackPressed event.
             // If you are using the NavigationHelper provided by some templates,
             // this event is handled for you.
+
+            // Temporarily deferring to PageBase to cover page load functionality  
+            base.OnNavigatedTo(e);
+        }
+
+        protected override void LoadState(object state)
+        {
+            var casted = state as MainPageState;
+
+            if (casted != null)
+            {
+                Vm.Load(casted.LastVisit);
+            }
+        }
+
+        protected override object SaveState()
+        {
+            return new MainPageState
+            {
+                LastVisit = DateTime.Now
+            };
+        }
+    }
+
+    public class MainPageState
+    {
+        public DateTime LastVisit
+        {
+            get;
+            set;
         }
     }
 }

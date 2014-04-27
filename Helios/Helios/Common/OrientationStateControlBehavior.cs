@@ -214,11 +214,6 @@ namespace Helios.Common
                     SendMessage(PageOrientations.LandscapeFlipped);
                     break;
 
-                case PageOrientations.Snap:
-                    VisualStateManager.GoToState(control, SnapStateName, true);
-                    SendMessage(PageOrientations.Snap);
-                    break;
-
                 default:
                     VisualStateManager.GoToState(control, LandscapeStateName, true);
                     SendMessage(PageOrientations.Landscape);

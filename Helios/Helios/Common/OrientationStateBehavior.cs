@@ -82,19 +82,7 @@ namespace Helios.Common
         {
             if (!ViewModelBase.IsInDesignModeStatic)
             {
-                if (_associatedPage.ActualWidth < SnapViewMaximumWidth)
-                {
-                    if (DisplayInformation.GetForCurrentView().CurrentOrientation != DisplayOrientations.Portrait
-                        && DisplayInformation.GetForCurrentView().CurrentOrientation
-                        != DisplayOrientations.PortraitFlipped)
-                    {
-                        HandleOrientation(PageOrientations.Snap);
-                    }
-                }
-                else
-                {
-                    HandleOrientation(DisplayInformation.GetForCurrentView().CurrentOrientation.GetPageOrientation());
-                }
+                HandleOrientation(DisplayInformation.GetForCurrentView().CurrentOrientation.GetPageOrientation());
             }
         }
 

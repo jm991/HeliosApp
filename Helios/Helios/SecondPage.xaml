@@ -28,60 +28,7 @@
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="OrientationStates">
                 <VisualState x:Name="Landscape" />
-                <VisualState x:Name="Portrait">
-                    <Storyboard>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)"
-                                                       Storyboard.TargetName="Placeholder">
-                            <DiscreteObjectKeyFrame KeyTime="0">
-                                <DiscreteObjectKeyFrame.Value>
-                                    <Thickness>29,59,29,0</Thickness>
-                                </DiscreteObjectKeyFrame.Value>
-                            </DiscreteObjectKeyFrame>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)"
-                                                       Storyboard.TargetName="BackButton">
-                            <DiscreteObjectKeyFrame KeyTime="0">
-                                <DiscreteObjectKeyFrame.Value>
-                                    <Thickness>29,59,29,0</Thickness>
-                                </DiscreteObjectKeyFrame.Value>
-                            </DiscreteObjectKeyFrame>
-                        </ObjectAnimationUsingKeyFrames>
-                    </Storyboard>
-                </VisualState>
-
-                <VisualState x:Name="Snap">
-                    <Storyboard>
-                        <DoubleAnimation Duration="0"
-                                         To="24"
-                                         Storyboard.TargetProperty="(TextBlock.FontSize)"
-                                         Storyboard.TargetName="PageTitle"
-                                         d:IsOptimized="True" />
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)"
-                                                       Storyboard.TargetName="BackButton">
-                            <DiscreteObjectKeyFrame KeyTime="0">
-                                <DiscreteObjectKeyFrame.Value>
-                                    <Thickness>20,40,20,0</Thickness>
-                                </DiscreteObjectKeyFrame.Value>
-                            </DiscreteObjectKeyFrame>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)"
-                                                       Storyboard.TargetName="PageTitle">
-                            <DiscreteObjectKeyFrame KeyTime="0">
-                                <DiscreteObjectKeyFrame.Value>
-                                    <Thickness>0,0,30,73</Thickness>
-                                </DiscreteObjectKeyFrame.Value>
-                            </DiscreteObjectKeyFrame>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)"
-                                                       Storyboard.TargetName="Placeholder">
-                            <DiscreteObjectKeyFrame KeyTime="0">
-                                <DiscreteObjectKeyFrame.Value>
-                                    <Thickness>20,40,20,0</Thickness>
-                                </DiscreteObjectKeyFrame.Value>
-                            </DiscreteObjectKeyFrame>
-                        </ObjectAnimationUsingKeyFrames>
-                    </Storyboard>
-                </VisualState>
+                <VisualState x:Name="Portrait" />
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
 

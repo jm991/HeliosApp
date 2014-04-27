@@ -192,7 +192,8 @@ namespace Helios.ViewModel
             openPicker.FileTypeFilter.Add(".avi");
 
             // Store this instance as the last caller of the continuation code
-            ((App)(App.Current)).fileOpenPickerCaller = this;
+            ((App)(App.Current)).PickerCaller = this;
+
             // Launch file open picker and caller app is suspended and may be terminated if required
             openPicker.PickSingleFileAndContinue();
         }

@@ -32,7 +32,7 @@ namespace Helios
         ContinuationManager continuationManager;
 #endif
         private TransitionCollection transitions;
-        public IFileOpenPickerContinuable fileOpenPickerCaller;
+        public IContinuable PickerCaller { get; set; }
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -221,7 +221,7 @@ namespace Helios
             var continuationEventArgs = e as IContinuationActivatedEventArgs;
             if (continuationEventArgs != null)
             {
-                object continuable = fileOpenPickerCaller;
+                object continuable = PickerCaller;
                 if (continuable != null)
                 {
                     // Call ContinuationManager to handle continuation activation

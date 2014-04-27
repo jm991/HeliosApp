@@ -137,10 +137,18 @@ public class ContinuationManager
 }
 
 /// <summary>
+/// Base interface for all ContinuationManager continuable types
+/// </summary>
+public interface IContinuable
+{
+
+}
+
+/// <summary>
 /// Implement this interface if your page invokes the file open picker
 /// API.
 /// </summary>
-public interface IFileOpenPickerContinuable
+interface IFileOpenPickerContinuable : IContinuable
 {
     /// <summary>
     /// This method is invoked when the file open picker returns picked
@@ -154,7 +162,7 @@ public interface IFileOpenPickerContinuable
 /// Implement this interface if your page invokes the file save picker
 /// API
 /// </summary>
-interface IFileSavePickerContinuable
+interface IFileSavePickerContinuable : IContinuable
 {
     /// <summary>
     /// This method is invoked when the file save picker returns saved
@@ -167,7 +175,7 @@ interface IFileSavePickerContinuable
 /// <summary>
 /// Implement this interface if your page invokes the folder picker API
 /// </summary>
-interface IFolderPickerContinuable
+interface IFolderPickerContinuable : IContinuable
 {
     /// <summary>
     /// This method is invoked when the folder picker returns the picked
@@ -181,7 +189,7 @@ interface IFolderPickerContinuable
 /// Implement this interface if your page invokes the web authentication
 /// broker
 /// </summary>
-interface IWebAuthenticationContinuable
+interface IWebAuthenticationContinuable : IContinuable
 {
     /// <summary>
     /// This method is invoked when the web authentication broker returns

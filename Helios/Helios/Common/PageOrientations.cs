@@ -30,9 +30,5 @@
         //     of the display viewing area is greater than the width. This portrait mode
         //     is flipped 180 degrees from the Portrait mode.
         PortraitFlipped = 8,
-        //
-        // Summary:
-        //     Specifies that the page is in "snap mode" or "split mode".
-        Snap = 16,
     }
 }

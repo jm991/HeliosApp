@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GalaSoft.MvvmLight;
+using System;
 using Windows.Phone.UI.Input;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -11,6 +12,8 @@ namespace Helios.Common
 
         private readonly NavigationHelper _navigationHelper;
 
+        public static PageBase Current;
+
         public NavigationHelper NavigationHelper
         {
             get
@@ -21,12 +24,22 @@ namespace Helios.Common
 
         protected PageBase()
         {
+            // This is a static public property that allows downstream pages to get a handle to the PageBase instance
+            // in order to call methods that are in this class.
+            Current = this;
+
             _navigationHelper = new NavigationHelper(this);
             _navigationHelper.LoadState += NavigationHelperLoadState;
             _navigationHelper.SaveState += NavigationHelperSaveState;
 
-
-            HardwareButtons.BackPressed += HardwareButtons_BackPressed;
+            if (ViewModelBase.IsInDesignModeStatic)
+            {
+                // Populate values here for blend
+            }
+            else
+            {
+                HardwareButtons.BackPressed += HardwareButtons_BackPressed;
+            }
         }
 
         protected virtual void LoadState(object state)

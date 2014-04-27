@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
+using System.Text;
 using System.Threading.Tasks;
+using Windows.ApplicationModel;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml;
@@ -92,10 +95,12 @@ namespace Helios.Common
         /// state, which in turn gives their active <see cref="Page"/> an opportunity restore its
         /// state.
         /// </summary>
+        /// <param name="sessionBaseKey">An optional key that identifies the type of session.
+        /// This can be used to distinguish between multiple application launch scenarios.</param>
         /// <returns>An asynchronous task that reflects when session state has been read.  The
         /// content of <see cref="SessionState"/> should not be relied upon until this task
         /// completes.</returns>
-        public static async Task RestoreAsync()
+        public static async Task RestoreAsync(String sessionBaseKey = null)
         {
             _sessionState = new Dictionary<String, Object>();
 
@@ -114,7 +119,7 @@ namespace Helios.Common
                 foreach (var weakFrameReference in _registeredFrames)
                 {
                     Frame frame;
-                    if (weakFrameReference.TryGetTarget(out frame))
+                    if (weakFrameReference.TryGetTarget(out frame) && (string)frame.GetValue(FrameSessionBaseKeyProperty) == sessionBaseKey)
                     {
                         frame.ClearValue(FrameSessionStateProperty);
                         RestoreFrameNavigationState(frame);
@@ -129,6 +134,8 @@ namespace Helios.Common
 
         private static DependencyProperty FrameSessionStateKeyProperty =
             DependencyProperty.RegisterAttached("_FrameSessionStateKey", typeof(String), typeof(SuspensionManager), null);
+        private static DependencyProperty FrameSessionBaseKeyProperty =
+            DependencyProperty.RegisterAttached("_FrameSessionBaseKeyParams", typeof(String), typeof(SuspensionManager), null);
         private static DependencyProperty FrameSessionStateProperty =
             DependencyProperty.RegisterAttached("_FrameSessionState", typeof(Dictionary<String, Object>), typeof(SuspensionManager), null);
         private static List<WeakReference<Frame>> _registeredFrames = new List<WeakReference<Frame>>();
@@ -145,7 +152,9 @@ namespace Helios.Common
         /// <see cref="SuspensionManager"/></param>
         /// <param name="sessionStateKey">A unique key into <see cref="SessionState"/> used to
         /// store navigation-related information.</param>
-        public static void RegisterFrame(Frame frame, String sessionStateKey)
+        /// <param name="sessionBaseKey">An optional key that identifies the type of session.
+        /// This can be used to distinguish between multiple application launch scenarios.</param>
+        public static void RegisterFrame(Frame frame, String sessionStateKey, String sessionBaseKey = null)
         {
             if (frame.GetValue(FrameSessionStateKeyProperty) != null)
             {
@@ -155,6 +164,12 @@ namespace Helios.Common
             if (frame.GetValue(FrameSessionStateProperty) != null)
             {
                 throw new InvalidOperationException("Frames must be either be registered before accessing frame session state, or not registered at all");
+            }
+
+            if (!string.IsNullOrEmpty(sessionBaseKey))
+            {
+                frame.SetValue(FrameSessionBaseKeyProperty, sessionBaseKey);
+                sessionStateKey = sessionBaseKey + "_" + sessionStateKey;
             }
 
             // Use a dependency property to associate the session key with a frame, and keep a list of frames whose
@@ -197,7 +212,7 @@ namespace Helios.Common
         /// page-specific state instead of working with frame session state directly.</remarks>
         /// <param name="frame">The instance for which session state is desired.</param>
         /// <returns>A collection of state subject to the same serialization mechanism as
-        /// <see cref="NavigationHelper"/>.</returns>
+        /// <see cref="SessionState"/>.</returns>
         public static Dictionary<String, Object> SessionStateForFrame(Frame frame)
         {
             var frameState = (Dictionary<String, Object>)frame.GetValue(FrameSessionStateProperty);

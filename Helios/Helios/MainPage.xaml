@@ -227,6 +227,25 @@
             x:Name="Bottom"
             Grid.Row="2" 
             />
+        
+        <Button
+            Grid.Row="2"
+            x:Name="PickAFileButton"
+            Style="{StaticResource LargeAppBarButtonStyle}"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Command="{Binding OpenFileCommand}"
+            >
+            <FontIcon 
+                Glyph="&#xE01E;" 
+                Margin="2.4,2.4,0,0" 
+                FontSize="28"
+                FontFamily="{StaticResource AppFont}"
+                />
+            <Button.RenderTransform>
+                <CompositeTransform/>
+            </Button.RenderTransform>
+        </Button>
     </Grid>
 
     <common:PageBase.BottomAppBar>

@@ -1,9 +1,11 @@
 ﻿using GalaSoft.MvvmLight.Threading;
+using Helios.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
@@ -26,6 +28,9 @@ namespace Helios
     /// </summary>
     public sealed partial class App : Application
     {
+#if WINDOWS_PHONE_APP
+        ContinuationManager continuationManager;
+#endif
         private TransitionCollection transitions;
 
         /// <summary>
@@ -44,7 +49,7 @@ namespace Helios
         /// search results, and so forth.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e)
+        protected async override void OnLaunched(LaunchActivatedEventArgs e)
         {
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
@@ -54,6 +59,7 @@ namespace Helios
 #endif
 
             Frame rootFrame = Window.Current.Content as Frame;
+            await RestoreStatusAsync(e.PreviousExecutionState);
 
             // Do not repeat app initialization when the Window already has content,
             // just ensure that the window is active
@@ -126,9 +132,10 @@ namespace Helios
         /// </summary>
         /// <param name="sender">The source of the suspend request.</param>
         /// <param name="e">Details about the suspend request.</param>
-        private void OnSuspending(object sender, SuspendingEventArgs e)
+        private async void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
+            await SuspensionManager.SaveAsync();
 
             // TODO: Save application state and stop any background activity
             deferral.Complete();
@@ -142,6 +149,86 @@ namespace Helios
         void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
         {
             throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
+        }
+
+        protected override void OnWindowCreated(WindowCreatedEventArgs e)
+        {
+            // Load the custom app font and insert it into the Resources map
+            FontFamily appFont = new FontFamily("/Assets/MoMoPhoneSym.ttf#MoMoPhone Symbol");
+            Resources.Add("AppFont", appFont);
+        }
+
+        private Frame CreateRootFrame()
+        {
+            Frame rootFrame = Window.Current.Content as Frame;
+
+            // Do not repeat app initialization when the Window already has content,
+            // just ensure that the window is active
+            if (rootFrame == null)
+            {
+                // Create a Frame to act as the navigation context and navigate to the first page
+                rootFrame = new Frame();
+
+                // Set the default language
+                rootFrame.Language = Windows.Globalization.ApplicationLanguages.Languages[0];
+                rootFrame.NavigationFailed += OnNavigationFailed;
+
+                // Place the frame in the current Window
+                Window.Current.Content = rootFrame;
+            }
+
+            return rootFrame;
+        }
+
+        private async Task RestoreStatusAsync(ApplicationExecutionState previousExecutionState)
+        {
+            // Do not repeat app initialization when the Window already has content,
+            // just ensure that the window is active
+            if (previousExecutionState == ApplicationExecutionState.Terminated)
+            {
+                // Restore the saved session state only when appropriate
+                try
+                {
+                    await SuspensionManager.RestoreAsync();
+                }
+                catch (SuspensionManagerException)
+                {
+                    //Something went wrong restoring state.
+                    //Assume there is no state and continue
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handle OnActivated event to deal with File Open/Save continuation activation kinds
+        /// </summary>
+        /// <param name="e">Application activated event arguments, it can be casted to proper sub-type based on ActivationKind</param>
+        protected async override void OnActivated(IActivatedEventArgs e)
+        {
+            base.OnActivated(e);
+
+            continuationManager = new ContinuationManager();
+
+            Frame rootFrame = CreateRootFrame();
+            await RestoreStatusAsync(e.PreviousExecutionState);
+
+            if (rootFrame.Content == null)
+            {
+                rootFrame.Navigate(typeof(MainPage));
+            }
+
+            var continuationEventArgs = e as IContinuationActivatedEventArgs;
+            if (continuationEventArgs != null)
+            {
+                object scenarioFrame = MainPage.Current.DataContext;
+                if (scenarioFrame != null)
+                {
+                    // Call ContinuationManager to handle continuation activation
+                    continuationManager.Continue(continuationEventArgs, scenarioFrame);
+                }
+            }
+
+            Window.Current.Activate();
         }
     }
 }

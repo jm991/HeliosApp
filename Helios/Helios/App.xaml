@@ -11,8 +11,16 @@
 
     <Application.Resources>
         <!-- Application-specific resources -->
+        <vm:ViewModelLocator 
+            x:Key="Locator"
+            d:IsDataSource="True" 
+            />
         
         <x:String x:Key="AppName">Helios</x:String>
+        
+        <SolidColorBrush x:Key="ButtonForegroundColor" Color="#FFFFFFFF"/>
+        <SolidColorBrush x:Key="ButtonBackgroundColor" Color="#26000000"/>
+        <SolidColorBrush x:Key="ButtonPressedForegroundColor" Color="#FF000000"/>
     
         <Style x:Key="HeaderTextBlockStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="32"/>
@@ -20,10 +28,48 @@
             <Setter Property="TextWrapping" Value="NoWrap"/>
             <Setter Property="TextAlignment" Value="Center"/>
         </Style>
+        
+        <Style x:Key="LargeAppBarButtonStyle" TargetType="ButtonBase">
+            <Setter Property="Foreground" Value="{StaticResource ButtonForegroundColor}"/>
+            <Setter Property="Background" Value="{StaticResource ButtonBackgroundColor}"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="AutomationProperties.ItemType" Value="App Bar Button"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ButtonBase">
+                        <Grid x:Name="RootGrid" Width="75" Height="75" Background="Transparent">
+                            <Ellipse
+                                        x:Name="BackgroundDisc"
+                                        Fill="{TemplateBinding Background}"
+                                        Stroke="{StaticResource ButtonForegroundColor}"
+                                        StrokeThickness="3.2"
+                                        Margin="1.6"/>
+                            <ContentPresenter
+                                        x:Name="ContentGlyph"
+                                        Content="{TemplateBinding Content}"
+                                        Margin="0 0 1 5"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"/>
 
-        <vm:ViewModelLocator 
-                x:Key="Locator"
-                d:IsDataSource="True" 
-                />
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BackgroundDisc" Storyboard.TargetProperty="Fill">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource ButtonForegroundColor}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentGlyph" Storyboard.TargetProperty="Foreground">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource ButtonPressedForegroundColor}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Application.Resources>
 </Application>

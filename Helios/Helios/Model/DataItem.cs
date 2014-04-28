@@ -16,7 +16,7 @@ namespace Helios.Model
         public MediaClip Clip
         {
             get;
-            private set;
+            set;
         }
 
         public bool MediaLoaded

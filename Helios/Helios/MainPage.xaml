@@ -8,6 +8,7 @@
     xmlns:local="using:Helios"
     xmlns:ignore="http://www.ignore.com"
     xmlns:converters="using:Helios.Converters"
+    xmlns:controls="using:Helios.Controls"
     x:Name="PageRoot"
     x:Class="Helios.MainPage"
     mc:Ignorable="d ignore"
@@ -35,52 +36,71 @@
                 <VisualState x:Name="Portrait" />
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-
-        <MediaElement 
-            x:Name="m_player" 
-            Grid.RowSpan="2"
-            Position="{Binding LastPosition}"
-            />
+		
+		<controls:Gauge 
+			Value="{Binding ElementName=MySlider, Path=Value}"
+            Unit="Trolls"
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="5 0 0 10"
+            NeedleBrush="Salmon"
+            TickBrush="RosyBrown"
+            ScaleBrush="Transparent"
+            ScaleTickBrush="Transparent"
+            TrailBrush="Salmon"
+            ScaleWidth="5" />
         
-        <TextBlock Text="{Binding WelcomeTitle}"/>
+        <Slider Value="30" x:Name="MySlider"/>
 
+		<Grid Visibility="Collapsed">
+			<MediaElement 
+				x:Name="m_player" 
+				Grid.RowSpan="2"
+				Position="{Binding LastPosition}"
+				/>
+        
+			<TextBlock Text="{Binding WelcomeTitle}"/>       
+        
 
-        <StackPanel 
-            VerticalAlignment="Bottom"
-            Margin="0 0 0 25"
-            >
-            <Slider
-                x:Name="TrimStart"
-                IsEnabled="{Binding MediaLoaded}"
-                Maximum="{Binding Converter={StaticResource clipToValueConverter}, ConverterParameter=duration, Path=Clip}"
-                Value="{Binding Path=TrimStartPosition, Mode=TwoWay}"
-                />
-            <Slider
-                x:Name="TrimEnd"
-                IsEnabled="{Binding MediaLoaded}"
-                Maximum="{Binding Converter={StaticResource clipToValueConverter}, ConverterParameter=duration, Path=Clip}"
-                Value="{Binding Path=TrimEndPosition, Mode=TwoWay}"
-                />
+			<StackPanel 
+				VerticalAlignment="Bottom"
+				Margin="0 0 0 25"
+				>
+				<Slider
+					x:Name="TrimStart"
+					IsEnabled="{Binding MediaLoaded}"
+					Maximum="{Binding Converter={StaticResource clipToValueConverter}, ConverterParameter=duration, Path=Clip}"
+					Value="{Binding Path=TrimStartPosition, Mode=TwoWay}"
+					/>
+				<Slider
+					x:Name="TrimEnd"
+					IsEnabled="{Binding MediaLoaded}"
+					Maximum="{Binding Converter={StaticResource clipToValueConverter}, ConverterParameter=duration, Path=Clip}"
+					Value="{Binding Path=TrimEndPosition, Mode=TwoWay}"
+					/>
+            
+            
 
-            <Button
-                Grid.Row="2"
-                x:Name="PickAFileButton"
-                Style="{StaticResource LargeAppBarButtonStyle}"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Command="{Binding OpenFileCommand}"
-                >
-                <FontIcon 
-                    Glyph="&#xE01E;" 
-                    Margin="2.4,2.4,0,0" 
-                    FontSize="28"
-                    FontFamily="{StaticResource AppFont}"
-                    />
-                <Button.RenderTransform>
-                    <CompositeTransform/>
-                </Button.RenderTransform>
-            </Button>
-        </StackPanel>
+				<Button
+					Grid.Row="2"
+					x:Name="PickAFileButton"
+					Style="{StaticResource LargeAppBarButtonStyle}"
+					HorizontalAlignment="Center"
+					VerticalAlignment="Center"
+					Command="{Binding OpenFileCommand}"
+					>
+					<FontIcon 
+						Glyph="&#xE01E;" 
+						Margin="2.4,2.4,0,0" 
+						FontSize="28"
+						FontFamily="{StaticResource AppFont}"
+						/>
+					<Button.RenderTransform>
+						<CompositeTransform/>
+					</Button.RenderTransform>
+				</Button>
+			</StackPanel>
+		</Grid>
     </Grid>
 
     <common:PageBase.BottomAppBar>

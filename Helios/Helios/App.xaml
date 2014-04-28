@@ -29,14 +29,14 @@
             <Setter Property="TextAlignment" Value="Center"/>
         </Style>
         
-        <Style x:Key="LargeAppBarButtonStyle" TargetType="ButtonBase">
+        <Style x:Key="LargeAppBarButtonStyle" TargetType="Button">
             <Setter Property="Foreground" Value="{StaticResource ButtonForegroundColor}"/>
             <Setter Property="Background" Value="{StaticResource ButtonBackgroundColor}"/>
             <Setter Property="VerticalAlignment" Value="Stretch"/>
             <Setter Property="AutomationProperties.ItemType" Value="App Bar Button"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="ButtonBase">
+                    <ControlTemplate TargetType="Button">
                         <Grid x:Name="RootGrid" Width="75" Height="75" Background="Transparent">
                             <Ellipse
                                         x:Name="BackgroundDisc"

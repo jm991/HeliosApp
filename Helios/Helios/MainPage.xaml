@@ -7,6 +7,7 @@
     xmlns:common="using:Helios.Common"
     xmlns:local="using:Helios"
     xmlns:ignore="http://www.ignore.com"
+    xmlns:converters="using:Helios.Converters"
     x:Name="PageRoot"
     x:Class="Helios.MainPage"
     mc:Ignorable="d ignore"
@@ -15,6 +16,7 @@
 
     <Page.Resources>
         <ResourceDictionary>
+            <converters:ClipToValueConverter x:Name="clipToValueConverter" />
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Skins/MainSkin.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -34,66 +36,70 @@
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="1*" />
-            <RowDefinition Height="1*"/>
-        </Grid.RowDefinitions>
-
-        <Grid>
-            <TextBlock 
-				x:Name="PageTitle"
-				Text="my mvvm app"
-				Style="{StaticResource HeaderTextBlockStyle}"
-				/>
-        </Grid>
-
-        <TextBlock 
-            x:Name="WelcomeTextBlock"
-            FontSize="21.333"
-            Text="{Binding WelcomeTitle}"
-            Grid.Row="1"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            FontFamily="Global User Interface"
-            TextAlignment="Center"
-            FontWeight="Light"
-            TextWrapping="WrapWholeWords" LineStackingStrategy="MaxHeight" 
-            />
-
-        <local:TestUserControl 
-            x:Name="Bottom"
-            Grid.Row="2" 
+        <MediaElement 
+            x:Name="m_player" 
+            Grid.RowSpan="2"
+            Position="{Binding LastPosition}"
             />
         
-        <Button
-            Grid.Row="2"
-            x:Name="PickAFileButton"
-            Style="{StaticResource LargeAppBarButtonStyle}"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Command="{Binding OpenFileCommand}"
+        <TextBlock Text="{Binding WelcomeTitle}"/>
+
+
+        <StackPanel 
+            VerticalAlignment="Bottom"
+            Margin="0 0 0 25"
             >
-            <FontIcon 
-                Glyph="&#xE01E;" 
-                Margin="2.4,2.4,0,0" 
-                FontSize="28"
-                FontFamily="{StaticResource AppFont}"
+            <Slider
+                x:Name="TrimStart"
+                IsEnabled="{Binding MediaLoaded}"
+                Maximum="{Binding Converter={StaticResource clipToValueConverter}, ConverterParameter=duration, Path=Clip}"
+                Value="{Binding Path=TrimStartPosition, Mode=TwoWay}"
                 />
-            <Button.RenderTransform>
-                <CompositeTransform/>
-            </Button.RenderTransform>
-        </Button>
+            <Slider
+                x:Name="TrimEnd"
+                IsEnabled="{Binding MediaLoaded}"
+                Maximum="{Binding Converter={StaticResource clipToValueConverter}, ConverterParameter=duration, Path=Clip}"
+                Value="{Binding Path=TrimEndPosition, Mode=TwoWay}"
+                />
+
+            <Button
+                Grid.Row="2"
+                x:Name="PickAFileButton"
+                Style="{StaticResource LargeAppBarButtonStyle}"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Command="{Binding OpenFileCommand}"
+                >
+                <FontIcon 
+                    Glyph="&#xE01E;" 
+                    Margin="2.4,2.4,0,0" 
+                    FontSize="28"
+                    FontFamily="{StaticResource AppFont}"
+                    />
+                <Button.RenderTransform>
+                    <CompositeTransform/>
+                </Button.RenderTransform>
+            </Button>
+        </StackPanel>
     </Grid>
 
     <common:PageBase.BottomAppBar>
         <CommandBar>
-            <AppBarButton 
-				x:Name="NextPageButton" 
-				Icon="Preview" 
-				Label="second page"
-				Command="{Binding NavigateCommand}" 
-				/>
+            <CommandBar.PrimaryCommands>
+                <AppBarButton 
+				    x:Name="NextPageButton" 
+				    Icon="Preview" 
+				    Label="second page"
+				    Command="{Binding NavigateCommand}" 
+				    />  
+            </CommandBar.PrimaryCommands>
+            
+            <CommandBar.SecondaryCommands>
+                <AppBarButton 
+                    Label="save" 
+                    Command="{Binding SaveFileCommand}"
+                    />
+            </CommandBar.SecondaryCommands>
         </CommandBar>
     </common:PageBase.BottomAppBar>
 </common:PageBase>

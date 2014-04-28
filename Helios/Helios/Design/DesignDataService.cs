@@ -9,7 +9,7 @@ namespace Helios.Design
         {
             // Use this to create design time data
 
-            var item = new DataItem("Welcome to MVVM Light [design testing]");
+            DataItem item = new DataItem("Welcome to MVVM Light [design testing]");
             return Task.FromResult(item);
         }
     }

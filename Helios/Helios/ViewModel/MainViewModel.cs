@@ -10,6 +10,10 @@ using Windows.Media.Core;
 using System.Diagnostics;
 using System.IO;
 using Windows.Storage.Pickers;
+using Windows.UI.ViewManagement;
+using Windows.Storage;
+using Windows.ApplicationModel.Core;
+using Windows.UI.Xaml.Controls;
 
 namespace Helios.ViewModel
 {
@@ -42,6 +46,8 @@ namespace Helios.ViewModel
         private MediaStreamSource m_mediaSource;
         private bool m_mediaLoaded;
         private TimeSpan m_lastPosition;
+
+        private const string fileNameAppend = "_Trim.mp4";
 
         #endregion
 
@@ -124,6 +130,10 @@ namespace Helios.ViewModel
             {
                 return m_clip;
             }
+            private set
+            {
+                Set(ref m_clip, value);
+            }
         }
 
         /// <summary>
@@ -140,6 +150,8 @@ namespace Helios.ViewModel
         }
 
         public RelayCommand OpenFileCommand { get; set; }
+
+        public RelayCommand SaveFileCommand { get; set; }
 
         /// <summary>
         /// Gets the WelcomeTitle property.
@@ -173,6 +185,7 @@ namespace Helios.ViewModel
             _dataService = dataService;
             _navigationService = navigationService;
             OpenFileCommand = new RelayCommand(OpenFile);
+            SaveFileCommand = new RelayCommand(TranscodeVideo);
 
             Initialize();
         }
@@ -198,6 +211,68 @@ namespace Helios.ViewModel
             openPicker.PickSingleFileAndContinue();
         }
 
+        public async void TranscodeVideo()
+        {
+            bool succeeded = false;
+            StatusBar statusBar = StatusBar.GetForCurrentView();
+
+            // Transcoding cannot be used if there is a MediaElement playing; unset it
+            MediaSource = null;
+
+            // Create a StorageFile to hold the result
+            StorageFile outputFile = await KnownFolders.SavedPictures.CreateFileAsync(fileName + fileNameAppend, CreationCollisionOption.GenerateUniqueName);
+
+            try
+            {
+                // Set up the progress bar
+                statusBar.ProgressIndicator.ProgressValue = 0.0f;
+                await statusBar.ProgressIndicator.ShowAsync();
+
+                // Begin rendering
+                var renderOperation = m_composition.RenderToFileAsync(outputFile);
+
+                renderOperation.Progress = async (_, progress) =>
+                {
+                    // Update the progress bar
+                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
+                        () =>
+                        {
+                            statusBar.ProgressIndicator.ProgressValue = progress / 100.0;
+                        });
+                };
+
+                await renderOperation;
+                succeeded = true;
+            }
+            catch (Exception ex)
+            {
+                Utilities.MessageBox(ex.Message);
+            }
+
+            await statusBar.ProgressIndicator.HideAsync();
+
+            // Transcode completed, show result
+            if (succeeded)
+            {
+                ContentDialog complete = new ContentDialog();
+                complete.Content = "Transcode complete.";
+                complete.PrimaryButtonText = "Play";
+                complete.SecondaryButtonText = "Cancel";
+                var result = await complete.ShowAsync();
+
+                if (result == ContentDialogResult.Primary)
+                {
+                    Uri savedUri = new Uri(outputFile.Path);
+                    // TODO: navigate to second page and put a mediaplayer control there
+                    //Frame.Navigate(typeof(Preview), savedUri);
+                }
+            }
+
+            // Reinitialize the MediaElement now that we are done
+            // TODO: use low res here too
+            MediaSource = m_composition.GenerateMediaStreamSource();
+        }
+
         ////public override void Cleanup()
         ////{
         ////    // Clean up if needed
@@ -220,15 +295,44 @@ namespace Helios.ViewModel
         {
             try
             {
-                var item = await _dataService.GetData();
+                DataItem item = await _dataService.GetData();
                 _originalTitle = item.Title;
                 WelcomeTitle = item.Title;
+
+                //var file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/Video.mp4", UriKind.Absolute));
+                //await LoadFile(file);
+
+                //Clip = item.Clip;
+                //MediaLoaded = item.MediaLoaded;
+
+                //TrimStartPosition = 1000;
+                //TrimEndPosition = 1000;
             }
             catch (Exception ex)
             {
+                WelcomeTitle = ex.ToString();
                 // Report error here
-                Utilities.MessageBox(ex.ToString());
+                if (!IsInDesignModeStatic)
+                {
+                    Utilities.MessageBox(ex.ToString());
+                }
             }
+        }
+
+        private async Task LoadFile(StorageFile file)
+        {
+            fileName = Path.GetFileNameWithoutExtension(file.Name);
+            Debug.WriteLine("Picked video: " + fileName + " with full name: " + file.Name);
+
+            MediaLoaded = true;
+
+            Clip = await MediaClip.CreateFromFileAsync(file);
+            m_composition = new MediaComposition();
+            m_composition.Clips.Add(Clip);
+
+            // Set up the MSS for the MediaElement to bind to for preview
+            // TODO: pass in the preview streamsource and grab the screensize to determine this in addition to the aspect ratio of the video
+            MediaSource = m_composition.GenerateMediaStreamSource();
         }
 
         #endregion
@@ -245,19 +349,7 @@ namespace Helios.ViewModel
         {
             if (args.Files.Count > 0)
             {
-                fileName = Path.GetFileNameWithoutExtension(args.Files[0].Name);
-                Debug.WriteLine("Picked video: " + fileName + " with full name: " + args.Files[0].Name);
-
-                MediaLoaded = true;
-
-                m_clip = await MediaClip.CreateFromFileAsync(args.Files[0]);
-                RaisePropertyChanged(Utilities.GetMemberName(() => Clip));
-                m_composition = new MediaComposition();
-                m_composition.Clips.Add(m_clip);
-
-                // Set up the MSS for the MediaElement to bind to for preview
-                // TODO: pass in the preview streamsource and grab the screensize to determine this in addition to the aspect ratio of the video
-                MediaSource = m_composition.GenerateMediaStreamSource();
+                await LoadFile(args.Files[0]);
             }
             else
             {

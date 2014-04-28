@@ -25,6 +25,7 @@ namespace Helios.Common
         {
             if (!ViewModelBase.IsInDesignModeStatic)
             {
+                // TODO: remove snap logic
                 if (ActualWidth < SnapViewMaximumWidth)
                 {
                     if (DisplayInformation.GetForCurrentView().CurrentOrientation != DisplayOrientations.Portrait

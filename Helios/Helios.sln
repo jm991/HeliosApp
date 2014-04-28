@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.30324.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helios", "Helios\Helios.csproj", "{301B4548-C4F1-4344-8940-E3AFF25A5BF0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helios.Converters", "Converters\Helios.Converters.csproj", "{93C2328A-995F-470A-8D3F-896EEBC83642}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,18 @@ Global
 		{301B4548-C4F1-4344-8940-E3AFF25A5BF0}.Release|x86.ActiveCfg = Release|x86
 		{301B4548-C4F1-4344-8940-E3AFF25A5BF0}.Release|x86.Build.0 = Release|x86
 		{301B4548-C4F1-4344-8940-E3AFF25A5BF0}.Release|x86.Deploy.0 = Release|x86
+		{93C2328A-995F-470A-8D3F-896EEBC83642}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93C2328A-995F-470A-8D3F-896EEBC83642}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93C2328A-995F-470A-8D3F-896EEBC83642}.Debug|ARM.ActiveCfg = Debug|ARM
+		{93C2328A-995F-470A-8D3F-896EEBC83642}.Debug|ARM.Build.0 = Debug|ARM
+		{93C2328A-995F-470A-8D3F-896EEBC83642}.Debug|x86.ActiveCfg = Debug|x86
+		{93C2328A-995F-470A-8D3F-896EEBC83642}.Debug|x86.Build.0 = Debug|x86
+		{93C2328A-995F-470A-8D3F-896EEBC83642}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93C2328A-995F-470A-8D3F-896EEBC83642}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93C2328A-995F-470A-8D3F-896EEBC83642}.Release|ARM.ActiveCfg = Release|ARM
+		{93C2328A-995F-470A-8D3F-896EEBC83642}.Release|ARM.Build.0 = Release|ARM
+		{93C2328A-995F-470A-8D3F-896EEBC83642}.Release|x86.ActiveCfg = Release|x86
+		{93C2328A-995F-470A-8D3F-896EEBC83642}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

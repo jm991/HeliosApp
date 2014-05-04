@@ -20,7 +20,7 @@ namespace Helios
 
         //List<Tick> labels = new List<Tick>();
         //List<Tick> ticks = new List<Tick>();
-        Canvas indicatorContainer;
+        private Canvas indicatorContainer;
 
         #endregion
 
@@ -56,7 +56,6 @@ namespace Helios
             get { return (double)GetValue(MinimumProperty); }
             set { SetValue(MinimumProperty, value); }
         }
-
         public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register(
             "Minimum", 
             typeof(double),
@@ -69,7 +68,6 @@ namespace Helios
             get { return (double)GetValue(MaximumProperty); }
             set { SetValue(MaximumProperty, value); }
         }
-
         public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register(
             "Maximum", 
             typeof(double), 
@@ -153,52 +151,71 @@ namespace Helios
 
         #region Dependency properties (range related)
 
-        //public ObservableCollection<GaugeRange> Ranges
-        //{
-        //    get { return (ObservableCollection<GaugeRange>)GetValue(RangesProperty); }
-        //    set { SetValue(RangesProperty, value); }
-        //}
-        //public static readonly DependencyProperty RangesProperty =
-        //    DependencyProperty.Register("Ranges", typeof(ObservableCollection<GaugeRange>), typeof(Scale), new PropertyMetadata(new ObservableCollection<GaugeRange>(), RangesPropertyChanged));
+        public ObservableCollection<GaugeRange> Ranges
+        {
+            get { return (ObservableCollection<GaugeRange>)GetValue(RangesProperty); }
+            set { SetValue(RangesProperty, value); }
+        }
+        public static readonly DependencyProperty RangesProperty = DependencyProperty.Register(
+            "Ranges",
+            typeof(ObservableCollection<GaugeRange>), 
+            typeof(Scale), 
+            new PropertyMetadata(new ObservableCollection<GaugeRange>(), RangesPropertyChanged)
+            );
 
         public int RangeThickness
         {
             get { return (int)GetValue(RangeThicknessProperty); }
             set { SetValue(RangeThicknessProperty, value); }
         }
-        public static readonly DependencyProperty RangeThicknessProperty =
-            DependencyProperty.Register("RangeThickness", typeof(int), typeof(Scale), new PropertyMetadata(1, RangeRelatedPropertyChanged));
+        public static readonly DependencyProperty RangeThicknessProperty = DependencyProperty.Register(
+            "RangeThickness", 
+            typeof(int), 
+            typeof(Scale), 
+            new PropertyMetadata(1, RangeRelatedPropertyChanged)
+            );
 
         public bool UseDefaultRange
         {
             get { return (bool)GetValue(UseDefaultRangeProperty); }
             set { SetValue(UseDefaultRangeProperty, value); }
         }
-        public static readonly DependencyProperty UseDefaultRangeProperty =
-            DependencyProperty.Register("UseDefaultRange", typeof(bool), typeof(Scale), new PropertyMetadata(true, RangeRelatedPropertyChanged));
-
-
+        public static readonly DependencyProperty UseDefaultRangeProperty = DependencyProperty.Register(
+            "UseDefaultRange", 
+            typeof(bool), 
+            typeof(Scale), 
+            new PropertyMetadata(true, RangeRelatedPropertyChanged)
+            );
+        
         public Color DefaultRangeColor
         {
             get { return (Color)GetValue(DefaultRangeColorProperty); }
             set { SetValue(DefaultRangeColorProperty, value); }
         }
-        public static readonly DependencyProperty DefaultRangeColorProperty =
-            DependencyProperty.Register("DefaultRangeColor", typeof(Color), typeof(Scale), new PropertyMetadata(Colors.White, RangeRelatedPropertyChanged));
-
+        public static readonly DependencyProperty DefaultRangeColorProperty = DependencyProperty.Register(
+            "DefaultRangeColor", 
+            typeof(Color), 
+            typeof(Scale), 
+            new PropertyMetadata(Colors.White, RangeRelatedPropertyChanged)
+            );
 
         public bool UseRangeColorsForTicks
         {
             get { return (bool)GetValue(UseRangeColorsForTicksProperty); }
             set { SetValue(UseRangeColorsForTicksProperty, value); }
         }
-        public static readonly DependencyProperty UseRangeColorsForTicksProperty =
-            DependencyProperty.Register("UseRangeColorsForTicks", typeof(bool), typeof(Scale), new PropertyMetadata(false, TickTemplatesChanged));
+        public static readonly DependencyProperty UseRangeColorsForTicksProperty = DependencyProperty.Register(
+            "UseRangeColorsForTicks", 
+            typeof(bool), 
+            typeof(Scale), 
+            new PropertyMetadata(false, TickTemplatesChanged)
+            );
 
         #endregion
 
 
-        #region dependency properties handlers
+        #region Dependency properties (handlers)
+
         private static void MinimumPropertyChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
             Scale scale = o as Scale;
@@ -210,6 +227,7 @@ namespace Helios
                 scale.RefreshIndicators();
             }
         }
+
         private static void MaximumPropertyChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
             Scale scale = o as Scale;
@@ -221,6 +239,7 @@ namespace Helios
                 scale.RefreshIndicators();
             }
         }
+
         //private static void TickStepPropertyChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         //{
         //    //- update the ticks and labels
@@ -233,6 +252,7 @@ namespace Helios
         //        scale.RefreshTicks();
         //    }
         //}
+
         private static void TickTemplatesChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
             //- update the ticks and labels
@@ -244,39 +264,42 @@ namespace Helios
                 scale.RefreshIndicators();
             }
         }
+
         private static void RangesPropertyChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
-            //- update the ranges
-            //- update the ticks and labels
+            // Update the ranges
+            // Update the ticks and labels
             Scale scale = o as Scale;
             if (scale != null)
             {
-                //if (e.OldValue != null)
-                //{
-                //    ((ObservableCollection<GaugeRange>)e.OldValue).CollectionChanged -= scale.Ranges_CollectionChanged;
-                //}
+                if (e.OldValue != null)
+                {
+                    ((ObservableCollection<GaugeRange>)e.OldValue).CollectionChanged -= scale.Ranges_CollectionChanged;
+                }
 
-                //if (e.NewValue != null)
-                //{
-                //    ObservableCollection<GaugeRange> col = e.NewValue as ObservableCollection<GaugeRange>;
-                //    col.CollectionChanged += scale.Ranges_CollectionChanged;
-                //    scale.RefreshRanges();
-                //    scale.RefreshTicks();
-                //    scale.RefreshLabels();
-                //}
+                if (e.NewValue != null)
+                {
+                    ObservableCollection<GaugeRange> col = e.NewValue as ObservableCollection<GaugeRange>;
+                    col.CollectionChanged += scale.Ranges_CollectionChanged;
+                    scale.RefreshRanges();
+                    scale.RefreshTicks();
+                    scale.RefreshLabels();
+                }
             }
         }
-        void Ranges_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+
+        private void Ranges_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             RefreshRanges();
             RefreshLabels();
             RefreshTicks();
         }
+
         private static void RangeRelatedPropertyChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
-            //- update the ranges
-            //- update the ticks and labels
-            //update the indicators
+            // Update the ranges
+            // Update the ticks and labels
+            // Update the indicators
             Scale scale = o as Scale;
             if (scale != null)
             {
@@ -286,35 +309,49 @@ namespace Helios
                 scale.RefreshIndicators();
             }
         }
+
         #endregion
 
-        #region abstract methods
+
+        #region Abstract methods
+
         protected abstract void ArrangeTicks(Size finalSize);
+
         protected abstract void ArrangeLabels(Size finalSize);
+
         protected abstract void ArrangeRanges(Size finalSize);
-        //range shape depends on the scale type so the ranges should
-        //be created in the derived types
+
+        // Range shape depends on the scale type so the ranges should
+        // be created in the derived types
         protected abstract void CreateRanges();
+
         protected abstract void ClearRanges();
+
         #endregion
 
-        #region overiddes
+
+        #region Overrides
+
         protected override Size ArrangeOverride(Size finalSize)
         {
             Debug.WriteLine("entered Scale.ArrangeOverride");
-            //arrange the children. since this is dependent of the scale type
-            //the arranging will be done in the derived classes
+            // Arrange the children. Since this is dependent of the scale type,
+            // the arranging will be done in the derived classes
             ArrangeLabels(finalSize);
             ArrangeTicks(finalSize);
             ArrangeRanges(finalSize);
-            //arrange the indicator container to occupy the entire available
-            //size. this will also call arrange on the children
-            //indicatorContainer.Arrange(new Rect(new Point(), finalSize));
-            //at the end just return the final size
+            // Arrange the indicator container to occupy the entire available
+            // size. This will also call arrange on the children
+            // indicatorContainer.Arrange(new Rect(new Point(), finalSize));
+            // at the end just return the final size
             ArrangeIndicators(finalSize);
             return finalSize;
         }
+
         #endregion
+
+
+        #region Helper methods (private)
 
         private void ArrangeIndicators(Size finalSize)
         {
@@ -324,7 +361,6 @@ namespace Helios
             }
         }
 
-        #region private helper methods
         //private void CreateLabels()
         //{
         //    double max = Maximum;
@@ -339,6 +375,7 @@ namespace Helios
         //        Children.Insert(0, tick);
         //    }
         //}
+
         //private void CreateTicks()
         //{
         //    double max = Maximum;
@@ -369,6 +406,7 @@ namespace Helios
         //        num += MinorTickStep;
         //    }
         //}
+
         //private void ClearLabels()
         //{
         //    for (int i = 0; i < labels.Count; i++)
@@ -377,6 +415,7 @@ namespace Helios
         //    }
         //    labels.Clear();
         //}
+
         //private void ClearTicks()
         //{
         //    for (int i = 0; i < ticks.Count; i++)
@@ -389,15 +428,15 @@ namespace Helios
         protected Color GetRangeColorForValue(double val)
         {
             // The value can be in more than 1 range since if it is in a range and 
-            // we might have another range with a bigger offset. ex:
-            // a value of 10 will be in ranges with offsets of 15, 20, etc
+            // we might have another range with a bigger offset. 
+            // Ex: a value of 10 will be in ranges with offsets of 15, 20, etc
             // This is why I order the ranges and return the first match
-            //var rngs = Ranges.OrderBy(p => p.Offset).ToList();
-            //for (int i = 0; i < rngs.Count; i++)
-            //{
-            //    if (val <= rngs[i].Offset)
-            //        return rngs[i].Color;
-            //}
+            var rngs = Ranges.OrderBy(p => p.Offset).ToList();
+            for (int i = 0; i < rngs.Count; i++)
+            {
+                if (val <= rngs[i].Offset)
+                    return rngs[i].Color;
+            }
             return DefaultRangeColor;
         }
 

@@ -15,7 +15,7 @@ namespace Helios
     {
         #region Fields (private)
 
-        Path thePath;
+        private Path thePath;
 
         #endregion
 
@@ -24,7 +24,7 @@ namespace Helios
 
         public RadialBarIndicator()
         {
-            DefaultStyleKey = typeof(RadialBarIndicator);
+            this.DefaultStyleKey = typeof(RadialBarIndicator);
         }
 
         #endregion
@@ -47,20 +47,25 @@ namespace Helios
                 SetIndicatorGeometry(scale, Value);
             }
         }
+
         protected override Size MeasureOverride(Size availableSize)
         {
-            //call the base version to set the parent
+            // Call the base version to set the parent
             base.MeasureOverride(availableSize);
-            //return all the available size
+            // Return all the available size
             double width = 0, height = 0;
             if (!double.IsInfinity(availableSize.Width))
+            {
                 width = availableSize.Width;
+            }
             if (!double.IsInfinity(availableSize.Height))
+            {
                 height = availableSize.Height;
+            }
             RadialScale scale = Owner as RadialScale;
             if (scale != null)
             {
-                //every time a resize happens the indicator needs to be redrawn
+                // Every time a resize happens the indicator needs to be redrawn
                 SetIndicatorGeometry(scale, Value);
             }
             return new Size(width, height);
@@ -71,9 +76,10 @@ namespace Helios
             TranslateTransform tt = new TranslateTransform();
             RadialScale scale = Owner as RadialScale;
             if (scale != null)
-            {//calculate the geometry again. the first time this was done the owner had a size of (0,0)
-                //and so did the indicator. once the owner has the correct size (measureOveride has been called)
-                //i should re-calculate the shape of the indicator
+            {
+                // Calculate the geometry again. The first time this was done the owner had a size of (0,0)
+                // and so did the indicator. Once the owner has the correct size (MeasureOverride has been called)
+                // we should re-calculate the shape of the indicator
                 SetIndicatorGeometry(scale, Value);
                 Point center = scale.GetIndicatorOffset();
                 tt.X = center.X;
@@ -91,6 +97,7 @@ namespace Helios
                 SetIndicatorGeometry(scale, Value);
             }
         }
+
         protected override void OnBarThicknesChanged(int newVal, int oldVal)
         {
             base.OnBarThicknesChanged(newVal, oldVal);
@@ -106,7 +113,7 @@ namespace Helios
 
         #region Methods
 
-        //sets the indicator geometry based on the scale and the current value
+        // Sets the indicator geometry based on the scale and the current value
         private void SetIndicatorGeometry(RadialScale scale, double value)
         {
             if (thePath != null)
@@ -122,9 +129,11 @@ namespace Helios
                 if (rad > BarThickness)
                 {
                     Geometry geom = RadialScaleHelper.CreateArcGeometry(min, max, rad, BarThickness, scale.SweepDirection);
-                    //stop the recursive loop. only set a new geometry if it is different from the current one
+                    // Stop the recursive loop. Only set a new geometry if it is different from the current one
                     if (thePath.Data == null || thePath.Data.Bounds != geom.Bounds)
+                    {
                         thePath.Data = geom;
+                    }
                 }
             }
         }

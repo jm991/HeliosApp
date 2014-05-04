@@ -12,13 +12,11 @@ namespace Helios
 {
     public class RadialScale : Scale
     {
-        public RadialType RadialType = RadialType.Quadrant;
-
-
         #region Fields (private)
 
         private List<Path> ranges = new List<Path>();
         private Path def = new Path();
+        private RadialType radialType = RadialType.Quadrant;
 
         #endregion
 
@@ -68,19 +66,27 @@ namespace Helios
         //}
         //public static readonly DependencyProperty TickPlacementProperty =
         //    DependencyProperty.Register("TickPlacement", typeof(RadialTickPlacement), typeof(RadialScale), new PropertyMetadata(RadialTickPlacement.Outward, TickPlacementPropertyChanged));
-        /*
+        
         public RadialType RadialType
         {
-            get { return (RadialType)GetValue(RadialTypeProperty); }
-            set { SetValue(RadialTypeProperty, value); }
+            get 
+            {
+                return radialType;
+                //return (RadialType)GetValue(RadTypeProperty); 
+            }
+            set 
+            {
+                radialType = value;
+                //SetValue(RadTypeProperty, value); 
+            }
         }
-        public static readonly DependencyProperty RadialTypeProperty = DependencyProperty.Register(
-            "RadialType", 
-            typeof(RadialType), 
-            typeof(RadialScale), 
-            new PropertyMetadata(RadialType.Circle, RadialTypePropertyChanged)
-            );
-        */
+        //public static readonly DependencyProperty RadialTypeProperty = DependencyProperty.Register(
+        //    "RadialType", 
+        //    typeof(RadialType), 
+        //    typeof(RadialScale), 
+        //    new PropertyMetadata(RadialType.Quadrant, RadialTypePropertyChanged)
+        //    );
+        
         //public bool EnableLabelRotation
         //{
         //    get { return (bool)GetValue(EnableLabelRotationProperty); }
@@ -148,10 +154,10 @@ namespace Helios
 
         #region Constructors
 
-        //public RadialScale()
-        //{
-        //    CreateRanges();
-        //}
+        public RadialScale()
+        {
+            CreateRanges();
+        }
 
         #endregion
 
@@ -203,20 +209,19 @@ namespace Helios
         // Radius of the owner - labels and ticks and ranges
         internal double GetIndicatorRadius()
         {
-            return 100;
-            //double maxRad = RadialScaleHelper.GetRadius(RadialType, /*new Size(ActualWidth, ActualHeight)*/this.DesiredSize, MinAngle, MaxAngle, SweepDirection);
-            //double rad = maxRad;// -GetLabels().Max(p => p.DesiredSize.Height) - GetTicks().Max(p => p.DesiredSize.Height) - 3;
-            //// Only if we have ranges
-            //if (UseDefaultRange || Ranges.Count > 0)
-            //{
-            //    rad -= RangeThickness;
-            //}
-            //return rad;
+            double maxRad = RadialScaleHelper.GetRadius(RadialType, /*new Size(ActualWidth, ActualHeight)*/this.DesiredSize, MinAngle, MaxAngle, SweepDirection);
+            double rad = maxRad;// -GetLabels().Max(p => p.DesiredSize.Height) - GetTicks().Max(p => p.DesiredSize.Height) - 3;
+            // Only if we have ranges
+            if (UseDefaultRange || Ranges.Count > 0)
+            {
+                rad -= RangeThickness;
+            }
+            return rad;
         }
 
         internal Point GetIndicatorOffset()
         {
-            return RadialScaleHelper.GetCenterPosition(RadialType, /*this.DesiredSize*/new Size(ActualWidth, ActualHeight), MinAngle, MaxAngle, SweepDirection);
+            return RadialScaleHelper.GetCenterPosition(RadialType, this.DesiredSize/*new Size(ActualWidth, ActualHeight)*/, MinAngle, MaxAngle, SweepDirection);
         }
 
         #endregion

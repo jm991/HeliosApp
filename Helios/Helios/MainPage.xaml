@@ -8,7 +8,7 @@
     xmlns:local="using:Helios"
     xmlns:ignore="http://www.ignore.com"
     xmlns:converters="using:Helios.Converters"
-    xmlns:controls="using:Helios.Controls"
+    xmlns:controls="using:Controls"
     x:Name="PageRoot"
     x:Class="Helios.MainPage"
     mc:Ignorable="d ignore"
@@ -36,8 +36,8 @@
                 <VisualState x:Name="Portrait" />
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-		
-		<controls:Gauge 
+
+        <!--<controls:Gauge 
 			Value="{Binding ElementName=MySlider, Path=Value}"
             Unit="Trolls"
             Grid.Row="1"
@@ -48,21 +48,21 @@
             ScaleBrush="Transparent"
             ScaleTickBrush="Transparent"
             TrailBrush="Salmon"
-            ScaleWidth="5" />
-        
+            ScaleWidth="5" />-->
+
         <Slider Value="30" x:Name="MySlider"/>
 
-		<Grid Visibility="Collapsed">
+		<Grid Opacity="100">
 			<MediaElement 
 				x:Name="m_player" 
 				Grid.RowSpan="2"
 				Position="{Binding LastPosition}"
 				/>
-        
-			<TextBlock Text="{Binding WelcomeTitle}"/>       
-        
 
-			<StackPanel 
+            <TextBlock Opacity="0" Text="{Binding WelcomeTitle}"/>
+
+
+            <StackPanel 
 				VerticalAlignment="Bottom"
 				Margin="0 0 0 25"
 				>

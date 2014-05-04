@@ -6,6 +6,7 @@
     xmlns:common="using:Helios.Common"
     xmlns:ignore="http://www.ignore.com"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:local="using:Helios"
     x:Name="PageRoot"
     x:Class="Helios.SecondPage"
     mc:Ignorable="d ignore"
@@ -14,27 +15,28 @@
     <common:PageBase.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Skins/MainSkin.xaml" />
-            </ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Skins/MainSkin.xaml"/>
+            </ResourceDictionary.MergedDictionaries>        	
         </ResourceDictionary>
     </common:PageBase.Resources>
 
     <interactivity:Interaction.Behaviors>
-        <common:OrientationStateBehavior PortraitFlippedStateName="Portrait" />
+        <common:OrientationStateBehavior PortraitFlippedStateName="Portrait"/>
     </interactivity:Interaction.Behaviors>
 
     <Grid x:Name="Root"
           Background="{StaticResource ApplicationPageBackgroundThemeBrush}">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="OrientationStates">
-                <VisualState x:Name="Landscape" />
-                <VisualState x:Name="Portrait" />
+                <VisualState x:Name="Landscape"/>
+                <VisualState x:Name="Portrait"/>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <Grid>
@@ -44,5 +46,71 @@
                 Style="{StaticResource HeaderTextBlockStyle}"
 				/>
         </Grid>
+
+        <Grid Grid.Row="1">
+            <!--<controls:Dial Width="400" Height="400" VerticalAlignment="Top" HorizontalAlignment="Left"/>-->
+            <!--<scada:RadialScale
+                    RangeThickness="5" 
+                    MinorTickStep="10" 
+                    MajorTickStep="50"
+                    MinAngle="-120" 
+                    MaxAngle="120">
+                    <scada:RadialBarIndicator 
+                        Value="{Binding ElementName=MySlider, Path=Value}"
+                        BarThickness="20" 
+                        BarBrush="{ThemeResource PhoneAccentBrush}" 
+                       />
+                </scada:RadialScale>-->
+            <!--<scada:RadialScale 
+                    Grid.RowSpan="2" 
+                    Grid.ColumnSpan="2"
+                    RangeThickness="5" 
+                    MinorTickStep="10" 
+                    MajorTickStep="50"
+                    MinAngle="-90" 
+                    MaxAngle="90">
+                    <scada:RadialScale.Ranges>
+                        <scada:GaugeRange Color="Red" Offset="20"/>
+                        <scada:GaugeRange Color="Orange" Offset="40"/>
+                        <scada:GaugeRange Color="WhiteSmoke" Offset="60"/>
+                        <scada:GaugeRange Color="Green" Offset="100"/>
+                    </scada:RadialScale.Ranges>
+                    <scada:RadialBarIndicator 
+                        Value="{Binding ElementName=MySlider,Path=Value}"
+                        BarThickness="20" 
+                        BarBrush="{StaticResource PhoneAccentBrush}"/>
+                    <scada:MarkerIndicator 
+                        Value="50"/>
+                </scada:RadialScale>-->
+            <!--<local:RadialScale></local:RadialScale>-->
+            <!--<local:RadialScale
+                RangeThickness="5"
+                MinAngle="-90"
+                MaxAngle="90">
+                <local:RadialScale.Ranges>
+                    <local:GaugeRange Color="Red" Offset="20"/>
+                    <local:GaugeRange Color="Orange" Offset="40"/>
+                    <local:GaugeRange Color="WhiteSmoke" Offset="60"/>
+                    <local:GaugeRange Color="Violet" Offset="100"/>
+                </local:RadialScale.Ranges>
+                <local:RadialBarIndicator 
+                    Value="{Binding ElementName=slider, Path=Value}"
+                    BarThickness="20" 
+                    BarBrush="{ThemeResource PhoneAccentBrush}"/>
+                <local:MarkerIndicator Value="50"/>
+            </local:RadialScale>-->
+
+            <Slider x:Name="slider" Value="20" Minimum="0" Maximum="400"/>
+        </Grid>
+        
+        <local:MarkerIndicator Grid.Row="2" Background="Azure"/>
+        <local:RadialScale
+            Grid.Row="2">
+            <local:RadialBarIndicator 
+                Value="{Binding ElementName=slider, Path=Value}"
+                BarThickness="20" 
+                BarBrush="{StaticResource PhoneAccentBrush}"
+                />
+        </local:RadialScale>
     </Grid>
 </common:PageBase>

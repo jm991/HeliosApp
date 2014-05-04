@@ -7,15 +7,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helios", "Helios\Helios.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helios.Converters", "Converters\Helios.Converters.csproj", "{93C2328A-995F-470A-8D3F-896EEBC83642}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helios.Controls", "Controls\Helios.Controls.csproj", "{B65D9DB6-7BAD-40D3-A632-AAEF16FE0F2E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|ARM = Debug|ARM
+		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
 		Release|ARM = Release|ARM
+		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
@@ -25,6 +25,9 @@ Global
 		{301B4548-C4F1-4344-8940-E3AFF25A5BF0}.Debug|ARM.ActiveCfg = Debug|ARM
 		{301B4548-C4F1-4344-8940-E3AFF25A5BF0}.Debug|ARM.Build.0 = Debug|ARM
 		{301B4548-C4F1-4344-8940-E3AFF25A5BF0}.Debug|ARM.Deploy.0 = Debug|ARM
+		{301B4548-C4F1-4344-8940-E3AFF25A5BF0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{301B4548-C4F1-4344-8940-E3AFF25A5BF0}.Debug|x64.Build.0 = Debug|Any CPU
+		{301B4548-C4F1-4344-8940-E3AFF25A5BF0}.Debug|x64.Deploy.0 = Debug|Any CPU
 		{301B4548-C4F1-4344-8940-E3AFF25A5BF0}.Debug|x86.ActiveCfg = Debug|x86
 		{301B4548-C4F1-4344-8940-E3AFF25A5BF0}.Debug|x86.Build.0 = Debug|x86
 		{301B4548-C4F1-4344-8940-E3AFF25A5BF0}.Debug|x86.Deploy.0 = Debug|x86
@@ -34,6 +37,9 @@ Global
 		{301B4548-C4F1-4344-8940-E3AFF25A5BF0}.Release|ARM.ActiveCfg = Release|ARM
 		{301B4548-C4F1-4344-8940-E3AFF25A5BF0}.Release|ARM.Build.0 = Release|ARM
 		{301B4548-C4F1-4344-8940-E3AFF25A5BF0}.Release|ARM.Deploy.0 = Release|ARM
+		{301B4548-C4F1-4344-8940-E3AFF25A5BF0}.Release|x64.ActiveCfg = Release|x64
+		{301B4548-C4F1-4344-8940-E3AFF25A5BF0}.Release|x64.Build.0 = Release|x64
+		{301B4548-C4F1-4344-8940-E3AFF25A5BF0}.Release|x64.Deploy.0 = Release|x64
 		{301B4548-C4F1-4344-8940-E3AFF25A5BF0}.Release|x86.ActiveCfg = Release|x86
 		{301B4548-C4F1-4344-8940-E3AFF25A5BF0}.Release|x86.Build.0 = Release|x86
 		{301B4548-C4F1-4344-8940-E3AFF25A5BF0}.Release|x86.Deploy.0 = Release|x86
@@ -41,26 +47,18 @@ Global
 		{93C2328A-995F-470A-8D3F-896EEBC83642}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{93C2328A-995F-470A-8D3F-896EEBC83642}.Debug|ARM.ActiveCfg = Debug|ARM
 		{93C2328A-995F-470A-8D3F-896EEBC83642}.Debug|ARM.Build.0 = Debug|ARM
+		{93C2328A-995F-470A-8D3F-896EEBC83642}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{93C2328A-995F-470A-8D3F-896EEBC83642}.Debug|x64.Build.0 = Debug|Any CPU
 		{93C2328A-995F-470A-8D3F-896EEBC83642}.Debug|x86.ActiveCfg = Debug|x86
 		{93C2328A-995F-470A-8D3F-896EEBC83642}.Debug|x86.Build.0 = Debug|x86
 		{93C2328A-995F-470A-8D3F-896EEBC83642}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{93C2328A-995F-470A-8D3F-896EEBC83642}.Release|Any CPU.Build.0 = Release|Any CPU
 		{93C2328A-995F-470A-8D3F-896EEBC83642}.Release|ARM.ActiveCfg = Release|ARM
 		{93C2328A-995F-470A-8D3F-896EEBC83642}.Release|ARM.Build.0 = Release|ARM
+		{93C2328A-995F-470A-8D3F-896EEBC83642}.Release|x64.ActiveCfg = Release|x64
+		{93C2328A-995F-470A-8D3F-896EEBC83642}.Release|x64.Build.0 = Release|x64
 		{93C2328A-995F-470A-8D3F-896EEBC83642}.Release|x86.ActiveCfg = Release|x86
 		{93C2328A-995F-470A-8D3F-896EEBC83642}.Release|x86.Build.0 = Release|x86
-		{B65D9DB6-7BAD-40D3-A632-AAEF16FE0F2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B65D9DB6-7BAD-40D3-A632-AAEF16FE0F2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B65D9DB6-7BAD-40D3-A632-AAEF16FE0F2E}.Debug|ARM.ActiveCfg = Debug|ARM
-		{B65D9DB6-7BAD-40D3-A632-AAEF16FE0F2E}.Debug|ARM.Build.0 = Debug|ARM
-		{B65D9DB6-7BAD-40D3-A632-AAEF16FE0F2E}.Debug|x86.ActiveCfg = Debug|x86
-		{B65D9DB6-7BAD-40D3-A632-AAEF16FE0F2E}.Debug|x86.Build.0 = Debug|x86
-		{B65D9DB6-7BAD-40D3-A632-AAEF16FE0F2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B65D9DB6-7BAD-40D3-A632-AAEF16FE0F2E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B65D9DB6-7BAD-40D3-A632-AAEF16FE0F2E}.Release|ARM.ActiveCfg = Release|ARM
-		{B65D9DB6-7BAD-40D3-A632-AAEF16FE0F2E}.Release|ARM.Build.0 = Release|ARM
-		{B65D9DB6-7BAD-40D3-A632-AAEF16FE0F2E}.Release|x86.ActiveCfg = Release|x86
-		{B65D9DB6-7BAD-40D3-A632-AAEF16FE0F2E}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

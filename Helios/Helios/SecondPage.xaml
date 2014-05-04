@@ -100,12 +100,18 @@
                 <local:MarkerIndicator Value="50"/>
             </local:RadialScale>-->
 
-            <Slider x:Name="slider" Value="20" Minimum="0" Maximum="400"/>
+            <Slider x:Name="slider" Value="90" Minimum="0" Maximum="400"/>
         </Grid>
         
         <local:MarkerIndicator Grid.Row="2" Background="Azure"/>
         <local:RadialScale
             Grid.Row="2">
+            <local:RadialScale.Ranges>
+                <local:GaugeRange Color="Red" Offset="20"/>
+                <local:GaugeRange Color="Orange" Offset="40"/>
+                <local:GaugeRange Color="WhiteSmoke" Offset="60"/>
+                <local:GaugeRange Color="Violet" Offset="100"/>
+            </local:RadialScale.Ranges>
             <local:RadialBarIndicator 
                 Value="{Binding ElementName=slider, Path=Value}"
                 BarThickness="20" 

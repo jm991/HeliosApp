@@ -103,9 +103,14 @@
             <Slider x:Name="slider" Value="90" Minimum="0" Maximum="400"/>
         </Grid>
         
-        <local:MarkerIndicator Grid.Row="2" Background="Azure"/>
         <local:RadialScale
-            Grid.Row="2">
+            Grid.Row="2"
+            RangeThickness="5"
+            MinAngle="-90"
+            MaxAngle="90"
+            Maximum="{Binding ElementName=slider, Path=Maximum}"
+            Minimum="{Binding ElementName=slider, Path=Minimum}"
+            >
             <local:RadialScale.Ranges>
                 <local:GaugeRange Color="Red" Offset="20"/>
                 <local:GaugeRange Color="Orange" Offset="40"/>
@@ -117,6 +122,8 @@
                 BarThickness="20" 
                 BarBrush="{StaticResource PhoneAccentBrush}"
                 />
+            <local:MarkerIndicator 
+                Value="{Binding ElementName=slider, Path=Value}"/>
         </local:RadialScale>
     </Grid>
 </common:PageBase>

@@ -32,6 +32,7 @@ namespace Helios
 
         #region Dependency properties
 
+        // Using a DependencyProperty as the backing store for MarkerTemplate. This enables animation, styling, binding, etc...
         public DataTemplate MarkerTemplate
         {
             get 
@@ -43,14 +44,17 @@ namespace Helios
                 SetValue(MarkerTemplateProperty, value); 
             }
         }
-
-        // Using a DependencyProperty as the backing store for MarkerTemplate. This enables animation, styling, binding, etc...
         public static readonly DependencyProperty MarkerTemplateProperty = DependencyProperty.Register(
             "MarkerTemplate", 
             typeof(DataTemplate), 
             typeof(MarkerIndicator), 
             new PropertyMetadata(null, MarkerTemplatePropertyChanged)
             );
+
+        #endregion
+
+
+        #region Dependency properties (handlers)
 
         private static void MarkerTemplatePropertyChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
@@ -114,44 +118,44 @@ namespace Helios
             {
                 return;
             }
-            //if (Owner is RadialScale)
-            //{
-            //    RadialScale rs = (RadialScale)Owner;
-            //    //get the angle based on the value
-            //    double angle = rs.GetAngleFromValue(Value);
-            //    if (rs.SweepDirection == SweepDirection.Counterclockwise)
-            //    {
-            //        angle = -angle;
-            //    }
-            //    //rotate the marker by angle
-            //    TransformGroup tg = RenderTransform as TransformGroup;
-            //    if (tg != null)
-            //    {
-            //        RotateTransform rt = tg.Children[0] as RotateTransform;
-            //        if (rt != null)
-            //        {
-            //            rt.Angle = angle;
-            //        }
-            //    }
-            //    //position the marker based on the radius
-            //    Point offset = rs.GetIndicatorOffset();
-            //    double rad = rs.GetIndicatorRadius();
+            if (Owner is RadialScale)
+            {
+                RadialScale rs = (RadialScale)Owner;
+                //get the angle based on the value
+                double angle = rs.GetAngleFromValue(Value);
+                if (rs.SweepDirection == SweepDirection.Counterclockwise)
+                {
+                    angle = -angle;
+                }
+                //rotate the marker by angle
+                TransformGroup tg = RenderTransform as TransformGroup;
+                if (tg != null)
+                {
+                    RotateTransform rt = tg.Children[0] as RotateTransform;
+                    if (rt != null)
+                    {
+                        rt.Angle = angle;
+                    }
+                }
+                //position the marker based on the radius
+                Point offset = rs.GetIndicatorOffset();
+                double rad = rs.GetIndicatorRadius();
 
-            //    //position the marker
-            //    double px = offset.X + (rad - DesiredSize.Height / 2) * Math.Sin(angle * Math.PI / 180);
-            //    double py = offset.Y - (rad - DesiredSize.Height / 2) * Math.Cos(angle * Math.PI / 180);
-            //    px -= DesiredSize.Width / 2;
-            //    py -= DesiredSize.Height / 2;
-            //    if (tg != null)
-            //    {
-            //        TranslateTransform tt = tg.Children[1] as TranslateTransform;
-            //        if (tt != null)
-            //        {
-            //            tt.X = px;
-            //            tt.Y = py;
-            //        }
-            //    }
-            //}
+                //position the marker
+                double px = offset.X + (rad - DesiredSize.Height / 2) * Math.Sin(angle * Math.PI / 180);
+                double py = offset.Y - (rad - DesiredSize.Height / 2) * Math.Cos(angle * Math.PI / 180);
+                px -= DesiredSize.Width / 2;
+                py -= DesiredSize.Height / 2;
+                if (tg != null)
+                {
+                    TranslateTransform tt = tg.Children[1] as TranslateTransform;
+                    if (tt != null)
+                    {
+                        tt.X = px;
+                        tt.Y = py;
+                    }
+                }
+            }
             //else
             //{
             //    LinearScale ls = Owner as LinearScale;

@@ -16,16 +16,22 @@ namespace Helios
 {
     public abstract class Indicator : Control
     {
+        #region Constructor
+
         public Indicator()
         {
             this.DefaultStyleKey = typeof(Indicator);
         }
+
+        #endregion
+
 
         #region Fields (private)
 
         private Scale owner;
 
         #endregion
+
 
         #region Properties (public)
 
@@ -47,6 +53,7 @@ namespace Helios
 
         #endregion
 
+
         #region Dependency properties
 
         public double Value
@@ -60,13 +67,17 @@ namespace Helios
                 SetValue(ValueProperty, value);
             }
         }
-
         public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(
             "Value", 
             typeof(double), 
             typeof(Indicator), 
             new PropertyMetadata(0.0, ValuePropertyChanged)
             );
+
+        #endregion
+
+
+        #region Dependency properties (handlers)
 
         private static void ValuePropertyChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {

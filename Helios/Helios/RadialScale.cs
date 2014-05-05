@@ -16,13 +16,25 @@ namespace Helios
 
         private List<Path> ranges = new List<Path>();
         private Path def = new Path();
-        private RadialType radialType = RadialType.Quadrant;
+        // TODO: figure out why this can't be a DP w/o XamlParseException
+        // This property can be used to minimize the space used by radial gauges when the angle span is within certain intervals. 
+        // Span <= 90 degrees: use Quarter to constrain the control to draw only a quadrant of the entire circle
+        // Span <= 180 degrees: use Semicircle to constrain the control to draw only half of an circle
+        // For everything else, use Circle
+        private RadialType radialType = RadialType.Semicircle;
+
+        #endregion
+
+
+        #region Properties (public)
+
+        public Point Center { get; set; }
 
         #endregion
 
 
         #region Dependency properties
-        
+
         public double MinAngle
         {
             get { return (double)GetValue(MinAngleProperty); }
@@ -201,22 +213,16 @@ namespace Helios
 
         internal double GetAngleFromValue(double value)
         {
-            // ANGLE = ((maxa - mina) * VAL + mina * maxv - maxa * minv) / (maxv - minv)
-            double angle = ((MaxAngle - MinAngle) * value + MinAngle * Maximum - MaxAngle * Minimum) / (Maximum - Minimum);
+            // ANGLE = ((maxa - mina) * VAL + (mina * maxv) - (maxa * minv)) / (maxv - minv)
+            double angle = ((MaxAngle - MinAngle) * value + (MinAngle * Maximum) - (MaxAngle * Minimum)) / (Maximum - Minimum);
             return angle;
         }
 
-        // Radius of the owner - labels and ticks and ranges
-        internal double GetIndicatorRadius()
+        internal double GetValueFromAngle(double angle)
         {
-            double maxRad = RadialScaleHelper.GetRadius(RadialType, /*new Size(ActualWidth, ActualHeight)*/this.DesiredSize, MinAngle, MaxAngle, SweepDirection);
-            double rad = maxRad;// -GetLabels().Max(p => p.DesiredSize.Height) - GetTicks().Max(p => p.DesiredSize.Height) - 3;
-            // Only if we have ranges
-            if (UseDefaultRange || Ranges.Count > 0)
-            {
-                rad -= RangeThickness;
-            }
-            return rad;
+            // VALUE = ((maxv - minv) * angle - (mina * maxv) + (maxa * minv)) / (maxa - mina)
+            double value = ((Maximum - Minimum) * angle - (MinAngle * Maximum) + (MaxAngle * Minimum)) / (MaxAngle - MinAngle);
+            return value;
         }
 
         internal Point GetIndicatorOffset()
@@ -325,6 +331,10 @@ namespace Helios
             {
                 double maxRad = RadialScaleHelper.GetRadius(RadialType, finalSize, MinAngle, MaxAngle, SweepDirection);
                 Point center = RadialScaleHelper.GetCenterPosition(RadialType, finalSize, MinAngle, MaxAngle, SweepDirection);
+
+                // Cache the center of the RadialScale
+                this.Center = center;
+
                 double x = center.X;
                 double y = center.Y;
                 // Calculate the ranges' radius
@@ -421,6 +431,24 @@ namespace Helios
         {
             ClearRanges();
             CreateRanges();
+        }
+
+        #endregion
+
+
+        #region Method
+
+        // Radius of the owner - labels and ticks and ranges
+        public double GetIndicatorRadius()
+        {
+            double maxRad = RadialScaleHelper.GetRadius(RadialType, /*new Size(ActualWidth, ActualHeight)*/this.DesiredSize, MinAngle, MaxAngle, SweepDirection);
+            double rad = maxRad;// -GetLabels().Max(p => p.DesiredSize.Height) - GetTicks().Max(p => p.DesiredSize.Height) - 3;
+            // Only if we have ranges
+            if (UseDefaultRange || Ranges.Count > 0)
+            {
+                rad -= RangeThickness;
+            }
+            return rad;
         }
 
         #endregion

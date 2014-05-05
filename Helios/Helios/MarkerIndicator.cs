@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,15 +8,23 @@ using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Shapes;
 
 namespace Helios
 {
     [TemplatePart(Name = "PART_Marker", Type = typeof(ContentPresenter))]
-    class MarkerIndicator : Indicator
+    public class MarkerIndicator : Indicator
     {
-        #region Fields (private)
+        #region Fields (protected to give access to subclasses)
 
-        ContentPresenter marker;
+        protected ContentPresenter marker;
+
+        #endregion
+
+
+        #region Properties (public)
+
+        public Point Center { get; set; }
 
         #endregion
 
@@ -75,6 +84,8 @@ namespace Helios
         {
             base.OnApplyTemplate();
             marker = GetTemplateChild("PART_Marker") as ContentPresenter;
+            // Make sure ManipulationMode="All" for the graphic drawn in the DataTemplate
+            marker.ManipulationDelta += marker_ManipulationDelta;
         }
 
         public override void Arrange(Size finalSize)
@@ -121,13 +132,13 @@ namespace Helios
             if (Owner is RadialScale)
             {
                 RadialScale rs = (RadialScale)Owner;
-                //get the angle based on the value
+                // Get the angle based on the value
                 double angle = rs.GetAngleFromValue(Value);
                 if (rs.SweepDirection == SweepDirection.Counterclockwise)
                 {
                     angle = -angle;
                 }
-                //rotate the marker by angle
+                // Rotate the marker by angle
                 TransformGroup tg = RenderTransform as TransformGroup;
                 if (tg != null)
                 {
@@ -137,13 +148,18 @@ namespace Helios
                         rt.Angle = angle;
                     }
                 }
-                //position the marker based on the radius
+                // Position the marker based on the radius
                 Point offset = rs.GetIndicatorOffset();
                 double rad = rs.GetIndicatorRadius();
 
                 //position the marker
                 double px = offset.X + (rad - DesiredSize.Height / 2) * Math.Sin(angle * Math.PI / 180);
                 double py = offset.Y - (rad - DesiredSize.Height / 2) * Math.Cos(angle * Math.PI / 180);
+
+                // Cache the intended position of the Indicator before it's centered
+                this.Center = new Point(px, py);
+
+                // Subtract the width of the Indicator's size so that it looks centered
                 px -= DesiredSize.Width / 2;
                 py -= DesiredSize.Height / 2;
                 if (tg != null)
@@ -181,6 +197,53 @@ namespace Helios
             //        }
             //    }
             //}
+        }
+
+        private double GetAngle(Point touchPoint, Point circleCenter)
+        {
+            var _X = touchPoint.X - circleCenter.X;
+            var _Y = touchPoint.Y - circleCenter.Y;
+            var _Hypot = Math.Sqrt(_X * _X + _Y * _Y);
+            var _Value = Math.Asin(_Y / _Hypot) * 180 / Math.PI;
+            var _Quadrant = (_X >= 0) ?
+                (_Y >= 0) ? Quadrants.se : Quadrants.ne :
+                (_Y >= 0) ? Quadrants.sw : Quadrants.nw;
+            double oldVal = _Value;
+            switch (_Quadrant)
+            {
+                case Quadrants.ne: _Value = 90 + _Value; break;
+                case Quadrants.nw: _Value = -(90 + _Value); break;
+                // TODO: fix the constants added to these two cases:
+                case Quadrants.sw: _Value = 270 + _Value; break;
+                case Quadrants.se: _Value = 090 - _Value; break;
+            }
+            //Debug.WriteLine("value: " + _Value + " oldVal: " + oldVal + " quad: " + _Quadrant);
+            return _Value;
+        }
+
+        #endregion
+
+
+        #region Event handlers
+
+        void marker_ManipulationDelta(object sender, Windows.UI.Xaml.Input.ManipulationDeltaRoutedEventArgs e)
+        {
+            if (Owner is RadialScale)
+            {
+                RadialScale rs = (RadialScale)Owner;
+                //Debug.WriteLine("radial angle: " + rs.GetAngleFromValue(Value));
+                GetAngle(this.Center, rs.Center);
+                // this.Angle = GetAngle(e.Position, this.RenderSize);
+                double radius = rs.GetIndicatorRadius();
+                double diameter = radius * 2;
+                Size rsSize = new Size(diameter, radius);
+                Point radialScaleAbsPos = (((UIElement)rs).TransformToVisual((Frame)Window.Current.Content) as GeneralTransform).TransformPoint(new Point(0, 0));
+                //Debug.WriteLine("position: " + e.Position + " size: " + rsSize + " center: " + RadialScaleHelper.GetCenterPosition(rs.RadialType, rsSize, rs.MinAngle, rs.MaxAngle, rs.SweepDirection) + " angle: " + GetAngle(e.Position, new Size(diameter, diameter)));
+
+                //Debug.WriteLine("angle: " + GetAngle(this.Center, rs.Center));
+                //Debug.WriteLine("Final Val: " + rs.GetValueFromAngle(GetAngle(this.Center.Add(e.Cumulative.Translation), rs.Center)));
+                Value = rs.GetValueFromAngle(GetAngle(this.Center.Add(e.Position), rs.Center));
+            }
         }
 
         #endregion

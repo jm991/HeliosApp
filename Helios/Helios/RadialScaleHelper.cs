@@ -67,9 +67,9 @@ namespace Helios
             }
 
         }
+
         public static double GetRadius(RadialType type, Size finalSize, double minAngle, double maxAngle, SweepDirection sweepDir)
         {
-
             //get the quadrants of the limits
             int q1 = GetQuadrant(minAngle);
             int q2 = GetQuadrant(maxAngle);
@@ -118,6 +118,7 @@ namespace Helios
                 return Math.Min(finalSize.Width / 2, finalSize.Height / 2);
             }
         }
+
         public static Geometry CreateArcGeometry(double minAngle, double maxAngle, double radius, int thickness, SweepDirection sweepDirection)
         {
             //the range will have 4 segments (arc, line, arc, line)
@@ -157,7 +158,8 @@ namespace Helios
             return path;
         }
 
-        #region helper methods
+        #region Helper methods (private)
+
         private static double GetRadiusForSemicircle(int q1, int q2, Size finalSize)
         {
             if (q1 == 1 && q2 == 2 || q2 == 1 && q1 == 2)
@@ -177,6 +179,7 @@ namespace Helios
                 return Math.Min(finalSize.Width, finalSize.Height / 2);
             }
         }
+
         private static Point GetCenterForQuadrant(int q, Size finalSize)
         {
             if (q == 1)
@@ -188,6 +191,7 @@ namespace Helios
             else
                 return new Point(0, 0);
         }
+
         private static Point GetCenterForSemicircle(int q1, int q2, Size finalSize)
         {
             if (q1 == 1 && q2 == 2 || q2 == 1 && q1 == 2)
@@ -199,17 +203,26 @@ namespace Helios
             else
                 return new Point(0, finalSize.Height / 2);
         }
+
         private static int GetQuadrant(double angle)
         {
             angle = angle * Math.PI / 180;
             if (Math.Sin(angle) >= 0 && Math.Cos(angle) >= 0)
+            {
                 return 1;
+            }
             else if (Math.Sin(angle) >= 0 && Math.Cos(angle) < 0)
+            {
                 return 2;
+            }
             else if (Math.Sin(angle) < 0 && Math.Cos(angle) < 0)
+            {
                 return 3;
+            }
             else
+            {
                 return 4;
+            }
         }
         #endregion
     }

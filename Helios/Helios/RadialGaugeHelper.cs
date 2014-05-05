@@ -118,7 +118,7 @@ namespace Helios
         }
 
 
-        #region helper methods
+        #region Helper methods (private)
 
         private static double GetRadiusForSemicircle(int q1, int q2, Size finalSize)
         {

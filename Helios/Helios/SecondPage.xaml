@@ -16,7 +16,23 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Skins/MainSkin.xaml"/>
-            </ResourceDictionary.MergedDictionaries>        	
+            </ResourceDictionary.MergedDictionaries>
+        	<Style x:Key="CircleMarkerIndicatorStyle" TargetType="local:MarkerIndicator">
+        		<Setter Property="MarkerTemplate">
+        			<Setter.Value>
+        				<DataTemplate>
+        					<Ellipse ManipulationMode="All" x:Name="PART_THUMB" Height="20" Width="20" Fill="White"/>
+        				</DataTemplate>
+        			</Setter.Value>
+        		</Setter>
+        		<Setter Property="Template">
+        			<Setter.Value>
+        				<ControlTemplate TargetType="local:MarkerIndicator">
+        					<ContentPresenter x:Name="PART_Marker" ContentTemplate="{TemplateBinding MarkerTemplate}"/>
+        				</ControlTemplate>
+        			</Setter.Value>
+        		</Setter>
+        	</Style>        	
         </ResourceDictionary>
     </common:PageBase.Resources>
 
@@ -104,6 +120,7 @@
         </Grid>
         
         <local:RadialScale
+            VerticalAlignment="Bottom"
             Grid.Row="2"
             RangeThickness="5"
             MinAngle="-90"
@@ -118,12 +135,13 @@
                 <local:GaugeRange Color="Violet" Offset="100"/>
             </local:RadialScale.Ranges>
             <local:RadialBarIndicator 
-                Value="{Binding ElementName=slider, Path=Value}"
+                Value="{Binding ElementName=Thumb, Path=Value}"
                 BarThickness="20" 
                 BarBrush="{StaticResource PhoneAccentBrush}"
                 />
-            <local:MarkerIndicator 
-                Value="{Binding ElementName=slider, Path=Value}"/>
+            <local:MarkerIndicator
+                Value="{Binding ElementName=slider, Path=Value}"
+                Name="Thumb" Style="{StaticResource CircleMarkerIndicatorStyle}"/>        
         </local:RadialScale>
     </Grid>
 </common:PageBase>

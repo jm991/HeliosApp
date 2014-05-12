@@ -17,7 +17,28 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Skins/MainSkin.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-        	<Style x:Key="CircleMarkerIndicatorStyle" TargetType="local:MarkerIndicator">
+            <DataTemplate x:Key="StoreFrontTileTemplate">
+                <local:ItemViewer/>
+            </DataTemplate>
+
+            <Style x:Key="StoreFrontTileStyle"  TargetType="GridViewItem">
+                <Setter Property="FontFamily" Value="Segoe UI" />
+                <Setter Property="Height" Value="80" />
+                <Setter Property="Width" Value="292" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="Margin" Value="0,0,8,8" />
+                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                <Setter Property="VerticalContentAlignment" Value="Top" />
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="TabNavigation" Value="Local" />
+                <Setter Property="ManipulationMode" Value="All"/>
+            </Style>
+
+            <ItemsPanelTemplate x:Key="StoreFrontGridItemsPanelTemplate">
+				<ItemsWrapGrid/>
+            </ItemsPanelTemplate>
+            
+            <Style x:Key="CircleMarkerIndicatorStyle" TargetType="local:MarkerIndicator">
         		<Setter Property="MarkerTemplate">
         			<Setter.Value>
         				<DataTemplate>
@@ -32,7 +53,7 @@
         				</ControlTemplate>
         			</Setter.Value>
         		</Setter>
-        	</Style>        	
+        	</Style>      	
         </ResourceDictionary>
     </common:PageBase.Resources>
 
@@ -118,9 +139,82 @@
 
             <Slider x:Name="slider" Value="90" Minimum="0" Maximum="400"/>
         </Grid>
-        
-        <local:RadialScale
-            VerticalAlignment="Bottom"
+
+        <Grid Grid.Row="2">
+            <!--<GridView 
+                x:Name="ItemGridView"
+                Width="Auto"
+                HorizontalAlignment="Stretch"
+                Background="{StaticResource ApplicationPageBackgroundThemeBrush}"
+                ItemTemplate="{StaticResource StoreFrontTileTemplate}"
+                ItemContainerStyle="{StaticResource StoreFrontTileStyle}"
+                ItemsPanel="{StaticResource StoreFrontGridItemsPanelTemplate}"
+                ShowsScrollingPlaceholders="False"
+                ContainerContentChanging="ItemGridView_ContainerContentChanging"
+                VerticalAlignment="Center"
+                CanReorderItems="True"
+                AllowDrop="True"
+                ManipulationMode="All"
+                CanDragItems="True"
+                ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                SelectionMode="Single"/>-->
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="12,0,12,12">
+                <CheckBox x:Name="enableReorderCheckbox"
+                    Content="Enable manual reorder" IsChecked="True" />
+            </StackPanel>
+
+            <local:ReorderListBox
+                x:Name="reorderListBox"
+                Grid.Row="2"
+                Margin="12,0,12,12"
+                IsReorderEnabled="{Binding IsChecked, ElementName=enableReorderCheckbox}"
+                ItemsSource="{Binding}"
+                d:DataContext="{d:DesignData Source=DesignData.xaml}">
+
+                <!--
+              The ReorderListBoxItem DragHandle template can be customized
+              via the ItemContainerStyle. The default polygons are copied below.
+            
+              Notes:
+                - The width MUST be equal to 52, required by other parts of the local template.
+                - The background SHOULD be non-empty (Transparent is OK) to enable
+                  dragging on any part of the handle area, not just the polygons.
+            -->
+                <!--
+            <local:ReorderListBox.ItemContainerStyle>
+                <Style
+                    TargetType="local:ReorderListBoxItem">
+                    <Setter
+                        Property="DragHandleTemplate">
+                        <Setter.Value>
+                            <DataTemplate>
+                                <Canvas
+                                    Width="52"
+                                    Height="48"
+                                    Background="Transparent">
+                                    <Polygon
+                                        Fill="Gray"
+                                        Points="16,20 4,20 22,4 22,44 16,44" />
+                                    <Polygon
+                                        Fill="Gray"
+                                        Points="32,28 44,28 26,44 26,4 32,4" />
+                                </Canvas>
+                            </DataTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </local:ReorderListBox.ItemContainerStyle>
+            -->
+            </local:ReorderListBox>
+        </Grid>
+
+        <!--<local:RadialScale
             Grid.Row="2"
             RangeThickness="5"
             MinAngle="-90"
@@ -135,13 +229,13 @@
                 <local:GaugeRange Color="Violet" Offset="100"/>
             </local:RadialScale.Ranges>
             <local:RadialBarIndicator 
-                Value="{Binding ElementName=Thumb, Path=Value}"
+                Value="{Binding ElementName=slider, Path=Value}"
                 BarThickness="20" 
                 BarBrush="{StaticResource PhoneAccentBrush}"
                 />
             <local:MarkerIndicator
                 Value="{Binding ElementName=slider, Path=Value}"
                 Name="Thumb" Style="{StaticResource CircleMarkerIndicatorStyle}"/>        
-        </local:RadialScale>
+        </local:RadialScale>-->
     </Grid>
 </common:PageBase>

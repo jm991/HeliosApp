@@ -1,0 +1,18 @@
+﻿<scg:List
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="using:System"
+    xmlns:scg="using:System.Collections.Generic"
+    x:TypeArguments="sys:String">
+    <sys:String>zero</sys:String>
+    <sys:String>one</sys:String>
+    <sys:String>two</sys:String>
+    <sys:String>three</sys:String>
+    <sys:String>four</sys:String>
+    <sys:String>five</sys:String>
+    <sys:String>six</sys:String>
+    <sys:String>seven</sys:String>
+    <sys:String>eight</sys:String>
+    <sys:String>nine</sys:String>
+    <sys:String>ten</sys:String>
+</scg:List>

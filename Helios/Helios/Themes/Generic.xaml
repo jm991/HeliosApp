@@ -388,11 +388,13 @@
                                     x:Name="NoDropIndicator">
                                     <Storyboard>
                                         <DoubleAnimation
+                                            EnableDependentAnimation="True"
                                             Storyboard.TargetName="DropBeforeSpace"
                                             Storyboard.TargetProperty="Height"
                                             To="0"
                                             Duration="0" />
                                         <DoubleAnimation
+                                            EnableDependentAnimation="True"
                                             Storyboard.TargetName="DropAfterSpace"
                                             Storyboard.TargetProperty="Height"
                                             To="0"
@@ -403,11 +405,13 @@
                                     x:Name="DropBeforeIndicator">
                                     <Storyboard>
                                         <DoubleAnimation
+                                            EnableDependentAnimation="True"
                                             Storyboard.TargetName="DropBeforeSpace"
                                             Storyboard.TargetProperty="Height"
                                             To="1"
                                             Duration="0" />
                                         <DoubleAnimation
+                                            EnableDependentAnimation="True"
                                             Storyboard.TargetName="DropAfterSpace"
                                             Storyboard.TargetProperty="Height"
                                             To="0"
@@ -418,11 +422,13 @@
                                     x:Name="DropAfterIndicator">
                                     <Storyboard>
                                         <DoubleAnimation
+                                            EnableDependentAnimation="True"
                                             Storyboard.TargetName="DropBeforeSpace"
                                             Storyboard.TargetProperty="Height"
                                             To="0"
                                             Duration="0" />
                                         <DoubleAnimation
+                                            EnableDependentAnimation="True"
                                             Storyboard.TargetName="DropAfterSpace"
                                             Storyboard.TargetProperty="Height"
                                             To="1"
@@ -435,6 +441,7 @@
                                         To="DropBeforeIndicator">
                                         <Storyboard>
                                             <DoubleAnimation
+                                                EnableDependentAnimation="True"
                                                 Storyboard.TargetName="DropBeforeSpace"
                                                 Storyboard.TargetProperty="Height"
                                                 To="1"
@@ -446,6 +453,7 @@
                                         To="DropAfterIndicator">
                                         <Storyboard>
                                             <DoubleAnimation
+                                                EnableDependentAnimation="True"
                                                 Storyboard.TargetName="DropAfterSpace"
                                                 Storyboard.TargetProperty="Height"
                                                 To="1"
@@ -457,6 +465,7 @@
                                         To="NoDropIndicator">
                                         <Storyboard>
                                             <DoubleAnimation
+                                                EnableDependentAnimation="True"
                                                 Storyboard.TargetName="DropBeforeSpace"
                                                 Storyboard.TargetProperty="Height"
                                                 To="0"
@@ -468,6 +477,7 @@
                                         To="NoDropIndicator">
                                         <Storyboard>
                                             <DoubleAnimation
+                                                EnableDependentAnimation="True"
                                                 Storyboard.TargetName="DropAfterSpace"
                                                 Storyboard.TargetProperty="Height"
                                                 To="0"
@@ -479,11 +489,13 @@
                                         To="DropAfterIndicator">
                                         <Storyboard>
                                             <DoubleAnimation
+                                                EnableDependentAnimation="True"
                                                 Storyboard.TargetName="DropBeforeSpace"
                                                 Storyboard.TargetProperty="Height"
                                                 To="0"
                                                 Duration="0:0:0.2" />
                                             <DoubleAnimation
+                                                EnableDependentAnimation="True"
                                                 Storyboard.TargetName="DropAfterSpace"
                                                 Storyboard.TargetProperty="Height"
                                                 To="1"
@@ -495,18 +507,20 @@
                                         To="DropBeforeIndicator">
                                         <Storyboard>
                                             <DoubleAnimation
+                                                EnableDependentAnimation="True"
                                                 Storyboard.TargetName="DropBeforeSpace"
                                                 Storyboard.TargetProperty="Height"
                                                 To="1"
                                                 Duration="0:0:0.2" />
                                             <DoubleAnimation
+                                                EnableDependentAnimation="True"
                                                 Storyboard.TargetName="DropAfterSpace"
                                                 Storyboard.TargetProperty="Height"
                                                 To="0"
                                                 Duration="0:0:0.2" />
                                         </Storyboard>
                                     </VisualTransition>
-                                </VisualStateGroup.Transitions>
+                                </VisualStateGroup.Transitions>                                
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                     </Grid>

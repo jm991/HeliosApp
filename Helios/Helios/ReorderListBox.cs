@@ -52,6 +52,7 @@ namespace Helios
 
         #region Private fields
 
+        private bool drawn = false;
         private double dragScrollDelta;
         private Panel itemsPanel;
         private ScrollViewer scrollViewer;
@@ -357,8 +358,12 @@ namespace Helios
                     RenderTargetBitmap renderTargetBitmap = new RenderTargetBitmap();
                     try
                     {
-                        await renderTargetBitmap.RenderAsync(this.dragItemContainer, (int)dragItemSize.Width, (int)dragItemSize.Height);
-                        this.dragIndicator.Source = renderTargetBitmap;
+                        if (dragItemContainer != null && dragItemContainer.Visibility == Visibility.Visible && !drawn)
+                        {
+                            drawn = true;
+                            await renderTargetBitmap.RenderAsync(this.dragItemContainer, (int)dragItemSize.Width, (int)dragItemSize.Height);
+                            this.dragIndicator.Source = renderTargetBitmap;
+                        }
                     }
                     catch (ArgumentException error)
                     {
@@ -372,8 +377,6 @@ namespace Helios
                     }
                 }
 
-                this.dragIndicator.Visibility = Visibility.Visible;
-                this.dragItemContainer.Visibility = Visibility.Collapsed;
 
                 if (this.itemsPanel.Children.IndexOf(this.dragItemContainer) < this.itemsPanel.Children.Count - 1)
                 {
@@ -383,6 +386,13 @@ namespace Helios
                 {
                     this.UpdateDropTarget(Canvas.GetTop(this.dragIndicator) - 1, false);
                 }
+            }
+
+            if (this.dragIndicator.Source != null)
+            {
+                // TODO: had to move these into an else to avoid race condition where collapsing dragItemContainer before RenderAsync completed
+                this.dragIndicator.Visibility = Visibility.Visible;
+                this.dragItemContainer.Visibility = Visibility.Collapsed;
             }
 
             double dragItemHeight = this.dragIndicator.Height;
@@ -409,7 +419,7 @@ namespace Helios
                 this.UpdateDropTarget(y + dragItemHeight / 2, true);
             }
 
-            translation.Y = y - top;
+            translation.Y = y -top;
 
             // Check if we're within the margin where auto-scroll needs to happen.
             bool scrolling = (this.dragScrollDelta != 0);
@@ -417,28 +427,33 @@ namespace Helios
             if (autoScrollMargin > 0 && y < autoScrollMargin)
             {
                 this.dragScrollDelta = y - autoScrollMargin;
+                // Set direction
+                this.DragScroll(dragScrollDelta);
                 if (!scrolling)
                 {
                     VisualStateManager.GoToState(this.scrollViewer, ReorderListBox.ScrollViewerScrollingVisualState, true);                    
 
                     // TODO: replaced this line:
                     // this.Dispatcher.BeginInvoke(() => this.DragScroll());
-                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
-                        new CoreDispatcherPriority(), () => this.DragScroll());
+                    //await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
+                    //    new CoreDispatcherPriority(), () => this.DragScroll(dragScrollDelta));
+                    //this.DragScroll(dragScrollDelta);
                     return;
                 }
             }
             else if (autoScrollMargin > 0 && y + dragItemHeight > this.dragInterceptorRect.Height - autoScrollMargin)
             {
                 this.dragScrollDelta = (y + dragItemHeight - (this.dragInterceptorRect.Height - autoScrollMargin));
+                this.DragScroll(dragScrollDelta);
                 if (!scrolling)
                 {
                     VisualStateManager.GoToState(this.scrollViewer, ReorderListBox.ScrollViewerScrollingVisualState, true);
                     
                     // TODO: replaced this line:
                     // this.Dispatcher.BeginInvoke(() => this.DragScroll());
-                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
-                        new CoreDispatcherPriority(), () => this.DragScroll());
+                    //await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
+                    //    new CoreDispatcherPriority(), () => this.DragScroll(dragScrollDelta));
+                    //this.DragScroll(dragScrollDelta);
                     return;
                 }
             }
@@ -529,28 +544,37 @@ namespace Helios
                 this.dragIndicator.Source = null;
                 VisualStateManager.GoToState(itemContainer, ReorderListBoxItem.NotDraggingState, true);
             }
+
+            // reset ability to call RenderAsync
+            drawn = false;
         }
 
         /// <summary>
         /// Automatically scrolls for as long as the drag is held within the margin.
         /// The speed of the scroll is adjusted based on the depth into the margin.
         /// </summary>
-        private async void DragScroll()
+        /// 
+        // TODO: added a parameter since the dragScrollDelta was 0 when this was called; something weird with the async programming
+        private async void DragScroll(double newDragScrollDelta)
         {
-            if (this.dragScrollDelta != 0)
+            if (newDragScrollDelta != 0)
             {
                 double scrollRatio = this.scrollViewer.ViewportHeight / this.scrollViewer.RenderSize.Height;
-                double adjustedDelta = this.dragScrollDelta * scrollRatio;
+                double adjustedDelta = newDragScrollDelta * scrollRatio;
                 double newOffset = this.scrollViewer.VerticalOffset + adjustedDelta;
                 // TODO: changed all of these lines
                 // this.scrollViewer.ScrollToVerticalOffset(newOffset);
-                this.scrollViewer.ChangeView(newOffset, null, null);
+                await Window.Current.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () => { bool offset = this.scrollViewer.ChangeView(null, newOffset, null); });
+                //Debug.WriteLine("scrolled " + newOffset);
 
                 // TODO: replaced this line:
                 // this.Dispatcher.BeginInvoke(() => this.DragScroll());
-                await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
-                    new CoreDispatcherPriority(), () => this.DragScroll());
+                // Keep calling the scroll method until it's no longer valid (like a while loop)
+                //await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
+                //    new CoreDispatcherPriority(), () => this.DragScroll(this.dragScrollDelta));
+                //DragScroll(this.dragScrollDelta);
 
+                // Sorts the dragIndicator Image to the end of the scrollable region so that it shows 
                 double dragItemOffset = Canvas.GetTop(this.dragIndicator) +
                     ((TranslateTransform)this.dragIndicator.RenderTransform).Y +
                     this.dragIndicator.Height / 2;
@@ -575,6 +599,8 @@ namespace Helios
             ReorderListBoxItem targetItem = targetElements.OfType<ReorderListBoxItem>().FirstOrDefault();
             if (targetItem != null)
             {
+                //Debug.WriteLine("drop target: " + targetItem.Content);
+
                 GeneralTransform targetTransform = targetItem.DragHandle.TransformToVisual(this.dragInterceptor);
                 Rect targetRect = targetTransform.TransformBounds(new Rect(new Point(0, 0), targetItem.DragHandle.RenderSize));
                 double targetCenter = (targetRect.Top + targetRect.Bottom) / 2;
@@ -666,7 +692,7 @@ namespace Helios
         /// <summary>
         /// Moves an item to a specified index in the source list.
         /// </summary>
-        private bool MoveItem(object item, int toIndex)
+        private async void /*bool*/ MoveItem(object item, int toIndex)
         {
             object itemsSource = this.ItemsSource;
 
@@ -692,13 +718,13 @@ namespace Helios
                 if (fromIndex <= scrollOffset && toIndex > scrollOffset)
                 {
                     // Correct the scroll offset for the removed item so that the list doesn't appear to jump.
-                    this.scrollViewer.ChangeView(scrollOffset - 1, null, null);
+                    await Window.Current.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () => { bool offset = this.scrollViewer.ChangeView(null, scrollOffset - 1, null); });
                 }
-                return true;
+                //return true;
             }
             else
             {
-                return false;
+                //return false;
             }
         }
 
@@ -839,7 +865,9 @@ namespace Helios
             if (this.rearrangeQueue == null)
             {
                 this.rearrangeQueue = new Queue<KeyValuePair<Action, Duration>>();
-                this.scrollViewer.ChangeView(this.scrollViewer.VerticalOffset, null, null); // Stop scrolling.
+                //this.scrollViewer.ChangeView(null, this.scrollViewer.VerticalOffset, null); // Stop scrolling.
+
+                await Window.Current.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () => { bool offset = this.scrollViewer.ChangeView(null, this.scrollViewer.VerticalOffset, null); });
                 
                 // TODO: replaced this line:
                 // this.Dispatcher.BeginInvoke(() =>

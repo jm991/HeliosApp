@@ -384,6 +384,19 @@ namespace Helios
                             drawn = true;
                             await renderTargetBitmap.RenderAsync(this.dragItemContainer, (int)dragItemSize.Width, (int)dragItemSize.Height);
                             this.dragIndicator.Source = renderTargetBitmap;
+
+
+                            // Don't show transitions (second param in UpdateDropTargets) so that the drop targets on either side of the dragged item
+                            // are instantly expanded (if they animated, it would be jarring)                
+                            if (this.itemsPanel.Children.IndexOf(this.dragItemContainer) < this.itemsPanel.Children.Count - 1)
+                            {
+                                // Special casing for if the dragged item is the last in the list
+                                this.UpdateDropTarget(Canvas.GetTop(this.dragIndicator) + this.dragIndicator.Height + 1, false);
+                            }
+                            else
+                            {
+                                this.UpdateDropTarget(Canvas.GetTop(this.dragIndicator) - 1, false);
+                            }
                         }
                     }
                     catch (ArgumentException error)
@@ -399,26 +412,15 @@ namespace Helios
                 }
             }
 
+            // TODO: moved all the code into check for the dragIndicator Image being null, since many values in the next half of this method
+            // depend on the dragIndicator Image being loaded
+            // It was essentially a race condition where ManipulationDelta kept getting called and this code was accessed before the Image was rendered            
             if (this.dragIndicator.Source != null)
             {
-                // Don't show transitions (second param in UpdateDropTargets) so that the drop targets on either side of the dragged item
-                // are instantly expanded (if they animated, it would be jarring)
-
-                // Special casing for if the dragged item is the last in th elist
-                if (this.itemsPanel.Children.IndexOf(this.dragItemContainer) < this.itemsPanel.Children.Count - 1)
-                {
-                    this.UpdateDropTarget(Canvas.GetTop(this.dragIndicator) + this.dragIndicator.Height + 1, false);
-                }
-                else
-                {
-                    this.UpdateDropTarget(Canvas.GetTop(this.dragIndicator) - 1, false);
-                }
-
-                // TODO: moved all the code into check for null, since many values depend on the dragIndicator Image being loaded
-                // TODO: had to move these into an else to avoid race condition where collapsing dragItemContainer before RenderAsync completed
+                // Collapsing dragItemContainer (the source for the Image being created) before RenderAsync completed would have been 
+                // meant that the method was looking for pixels to render that were hidden - hence, why it's moved to this part of the method
                 this.dragIndicator.Visibility = Visibility.Visible;
                 this.dragItemContainer.Visibility = Visibility.Collapsed;
-
 
                 double dragItemHeight = this.dragIndicator.Height;
 

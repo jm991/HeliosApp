@@ -111,7 +111,7 @@
                         <ScrollViewer
                             x:Name="ScrollViewer"
                             Grid.ColumnSpan="2"
-                            ManipulationMode="All"
+                            ManipulationMode="TranslateX,TranslateY"
                             Foreground="{TemplateBinding Foreground}"
                             Background="{TemplateBinding Background}"
                             BorderBrush="Transparent"
@@ -129,7 +129,7 @@
                             Background="Transparent"
                             VerticalAlignment="Stretch"
                             Width="52"
-                            ManipulationMode="All">
+                            ManipulationMode="TranslateX,TranslateY">
                             <!-- TODO: had to add manipulation mode here since no events were being fired-->
                             <Image
                                 x:Name="DragIndicator"
@@ -206,11 +206,13 @@
                         <Grid
                             x:Name="DropBeforeSpace"
                             Grid.Row="0"
+                            Background="AliceBlue"
                             Height="0">
                         </Grid>
                         <Grid
                             x:Name="DropAfterSpace"
                             Grid.Row="2"
+                            Background="Green"
                             Height="0">
                         </Grid>
                         <Border

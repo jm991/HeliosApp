@@ -36,6 +36,7 @@ namespace Helios
         public const string DragIndicatorPart = "DragIndicator";
         public const string DragInterceptorPart = "DragInterceptor";
         public const string RearrangeCanvasPart = "RearrangeCanvas";
+        public const string ItemsPanelPart = "ItemsPanel";
 
         #endregion
 
@@ -57,9 +58,21 @@ namespace Helios
         private Panel itemsPanel;
         private ScrollViewer scrollViewer;
         // TODO: made public
+        /// <summary>
+        /// The Canvas overlaid on the items that intercepts drag requests
+        /// </summary>
         public Canvas dragInterceptor;
+        /// <summary>
+        /// Image used as proxy for dragging item - more implementation agnostic than copying/instantiating a copy of the actual dragged control
+        /// </summary>
         private Image dragIndicator;
+        /// <summary>
+        /// Contents of dragItemContainer (unknown type, changes based on use of the control)
+        /// </summary>
         private object dragItem;
+        /// <summary>
+        /// Stored reference to currently dragged ReorderListBoxItem
+        /// </summary>
         private ReorderListBoxItem dragItemContainer;
         private bool isDragItemSelected;
         private Rect dragInterceptorRect;
@@ -276,27 +289,32 @@ namespace Helios
                 return;
             }
 
+            // Access the Panel containing all of the draggable ReorderListBoxItems
             if (this.itemsPanel == null)
             {
                 ItemsPresenter scrollItemsPresenter = (ItemsPresenter)this.scrollViewer.Content;
-                this.itemsPanel = FindChild<StackPanel>(Window.Current.Content, "ItemsPanel");
+                this.itemsPanel = Utilities.FindChild<StackPanel>(Window.Current.Content, ItemsPanelPart);
                 //this.itemsPanel = (Panel)VisualTreeHelper.GetChild(scrollItemsPresenter, 0);
             }
 
-            GeneralTransform interceptorTransform = this.dragInterceptor.TransformToVisual(
-                Window.Current.Content);
+            // Figure out the Point where the user put their finger down
+            GeneralTransform interceptorTransform = this.dragInterceptor.TransformToVisual(Window.Current.Content);
             // TODO: replace this line -
             // Point targetPoint = interceptorTransform.Transform(e.ManipulationOrigin);
             Point targetPoint = interceptorTransform.TransformPoint(e.Position);
             targetPoint = ReorderListBox.GetHostCoordinates(targetPoint);
 
+            // Get reference to all items at the Point where the finger is down
             List<UIElement> targetElements = VisualTreeHelper.FindElementsInHostCoordinates(
                 targetPoint, this.itemsPanel).ToList();
+            // Get the first eligible ReorderListBoxItem
             ReorderListBoxItem targetItemContainer = targetElements.OfType<ReorderListBoxItem>().FirstOrDefault();
             if (targetItemContainer != null && targetElements.Contains(targetItemContainer.DragHandle))
             {
+                // Transition to the VisualState for dragging (default is light grey underlay with lower opacity)
                 VisualStateManager.GoToState(targetItemContainer, ReorderListBoxItem.DraggingState, true);
 
+                // Position and resize the proxy image "dragIndicator"
                 GeneralTransform targetItemTransform = targetItemContainer.TransformToVisual(this.dragInterceptor);
                 Point targetItemOrigin = targetItemTransform.TransformPoint(new Point(0, 0));
                 Canvas.SetLeft(this.dragIndicator, targetItemOrigin.X);
@@ -304,6 +322,7 @@ namespace Helios
                 this.dragIndicator.Width = targetItemContainer.RenderSize.Width;
                 this.dragIndicator.Height = targetItemContainer.RenderSize.Height;
 
+                // Store references to the object being dragged
                 this.dragItemContainer = targetItemContainer;
                 this.dragItem = this.dragItemContainer.Content;
                 this.isDragItemSelected = this.dragItemContainer.IsSelected;
@@ -346,6 +365,8 @@ namespace Helios
                 VisualStateManager.GoToState(this.dragItemContainer, ReorderListBoxItem.DraggingState, false);
                 // TODO: stopped rendering every time on drag and replaced -
                 // writeableBitmap.Render(this.dragItemContainer, null);
+
+                // Render the Image of the dragged control asychronously
                 if (this.dragIndicator.Source == null)
                 {
                     //Task<RenderTargetBitmap> renderTask = RenderImageSource(this.dragItemContainer, dragItemSize);
@@ -376,8 +397,14 @@ namespace Helios
                         return;
                     }
                 }
+            }
 
+            if (this.dragIndicator.Source != null)
+            {
+                // Don't show transitions (second param in UpdateDropTargets) so that the drop targets on either side of the dragged item
+                // are instantly expanded (if they animated, it would be jarring)
 
+                // Special casing for if the dragged item is the last in th elist
                 if (this.itemsPanel.Children.IndexOf(this.dragItemContainer) < this.itemsPanel.Children.Count - 1)
                 {
                     this.UpdateDropTarget(Canvas.GetTop(this.dragIndicator) + this.dragIndicator.Height + 1, false);
@@ -386,81 +413,80 @@ namespace Helios
                 {
                     this.UpdateDropTarget(Canvas.GetTop(this.dragIndicator) - 1, false);
                 }
-            }
 
-            if (this.dragIndicator.Source != null)
-            {
+                // TODO: moved all the code into check for null, since many values depend on the dragIndicator Image being loaded
                 // TODO: had to move these into an else to avoid race condition where collapsing dragItemContainer before RenderAsync completed
                 this.dragIndicator.Visibility = Visibility.Visible;
                 this.dragItemContainer.Visibility = Visibility.Collapsed;
-            }
 
-            double dragItemHeight = this.dragIndicator.Height;
 
-            TranslateTransform translation = (TranslateTransform)this.dragIndicator.RenderTransform;
-            double top = Canvas.GetTop(this.dragIndicator);
+                double dragItemHeight = this.dragIndicator.Height;
 
-            // Limit the translation to keep the item within the list area.
-            // Use different targeting for the top and bottom edges to allow taller items to
-            // move before or after shorter items at the edges.
-            double y = top + e.Cumulative.Translation.Y;
-            if (y < 0)
-            {
-                y = 0;
-                this.UpdateDropTarget(0, true);
-            }
-            else if (y >= this.dragInterceptorRect.Height - dragItemHeight)
-            {
-                y = this.dragInterceptorRect.Height - dragItemHeight;
-                this.UpdateDropTarget(this.dragInterceptorRect.Height - 1, true);
-            }
-            else
-            {
-                this.UpdateDropTarget(y + dragItemHeight / 2, true);
-            }
+                TranslateTransform translation = (TranslateTransform)this.dragIndicator.RenderTransform;
+                double top = Canvas.GetTop(this.dragIndicator);
 
-            translation.Y = y -top;
-
-            // Check if we're within the margin where auto-scroll needs to happen.
-            bool scrolling = (this.dragScrollDelta != 0);
-            double autoScrollMargin = this.AutoScrollMargin;
-            if (autoScrollMargin > 0 && y < autoScrollMargin)
-            {
-                this.dragScrollDelta = y - autoScrollMargin;
-                // Set direction
-                this.DragScroll(dragScrollDelta);
-                if (!scrolling)
+                // Limit the translation to keep the item within the list area.
+                // Use different targeting for the top and bottom edges to allow taller items to
+                // move before or after shorter items at the edges.
+                double y = top + e.Cumulative.Translation.Y;
+                if (y < 0)
                 {
-                    VisualStateManager.GoToState(this.scrollViewer, ReorderListBox.ScrollViewerScrollingVisualState, true);                    
-
-                    // TODO: replaced this line:
-                    // this.Dispatcher.BeginInvoke(() => this.DragScroll());
-                    //await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
-                    //    new CoreDispatcherPriority(), () => this.DragScroll(dragScrollDelta));
-                    //this.DragScroll(dragScrollDelta);
-                    return;
+                    y = 0;
+                    this.UpdateDropTarget(0, true);
                 }
-            }
-            else if (autoScrollMargin > 0 && y + dragItemHeight > this.dragInterceptorRect.Height - autoScrollMargin)
-            {
-                this.dragScrollDelta = (y + dragItemHeight - (this.dragInterceptorRect.Height - autoScrollMargin));
-                this.DragScroll(dragScrollDelta);
-                if (!scrolling)
+                else if (y >= this.dragInterceptorRect.Height - dragItemHeight)
                 {
-                    VisualStateManager.GoToState(this.scrollViewer, ReorderListBox.ScrollViewerScrollingVisualState, true);
-                    
-                    // TODO: replaced this line:
-                    // this.Dispatcher.BeginInvoke(() => this.DragScroll());
-                    //await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
-                    //    new CoreDispatcherPriority(), () => this.DragScroll(dragScrollDelta));
-                    //this.DragScroll(dragScrollDelta);
-                    return;
+                    y = this.dragInterceptorRect.Height - dragItemHeight;
+                    this.UpdateDropTarget(this.dragInterceptorRect.Height - 1, true);
                 }
-            }
-            else
-            {
-                // We're not within the auto-scroll margin. This ensures any current scrolling is stopped.
-                this.dragScrollDelta = 0;
+                else
+                {
+                    this.UpdateDropTarget(y + dragItemHeight / 2, true);
+                }
+
+                translation.Y = y - top;
+
+                // Check if we're within the margin where auto-scroll needs to happen.
+                bool scrolling = (this.dragScrollDelta != 0);
+                double autoScrollMargin = this.AutoScrollMargin;
+                if (autoScrollMargin > 0 && y < autoScrollMargin)
+                {
+                    this.dragScrollDelta = y - autoScrollMargin;
+                    // Set direction
+                    this.DragScroll(dragScrollDelta);
+                    if (!scrolling)
+                    {
+                        VisualStateManager.GoToState(this.scrollViewer, ReorderListBox.ScrollViewerScrollingVisualState, true);
+
+                        // TODO: replaced this line:
+                        // this.Dispatcher.BeginInvoke(() => this.DragScroll());
+                        //await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
+                        //    new CoreDispatcherPriority(), () => this.DragScroll(dragScrollDelta));
+                        //this.DragScroll(dragScrollDelta);
+                        return;
+                    }
+                }
+                else if (autoScrollMargin > 0 && y + dragItemHeight > this.dragInterceptorRect.Height - autoScrollMargin)
+                {
+                    this.dragScrollDelta = (y + dragItemHeight - (this.dragInterceptorRect.Height - autoScrollMargin));
+                    this.DragScroll(dragScrollDelta);
+                    if (!scrolling)
+                    {
+                        VisualStateManager.GoToState(this.scrollViewer, ReorderListBox.ScrollViewerScrollingVisualState, true);
+
+                        // TODO: replaced this line:
+                        // this.Dispatcher.BeginInvoke(() => this.DragScroll());
+                        //await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
+                        //    new CoreDispatcherPriority(), () => this.DragScroll(dragScrollDelta));
+                        //this.DragScroll(dragScrollDelta);
+                        return;
+                    }
+                }
+                else
+                {
+                    // We're not within the auto-scroll margin. This ensures any current scrolling is stopped.
+                    this.dragScrollDelta = 0;
+                }
             }
         }
 
@@ -1278,59 +1304,6 @@ namespace Helios
             // Have to use this method instead of a TemplatePart, since the item is part of the ItemsPanelTemplate
             // See http://stackoverflow.com/questions/4786006/gettemplatechild-always-returns-null
             itemsPanel = sender as StackPanel;
-        }
-
-        /// <summary>
-        /// Finds a Child of a given item in the visual tree. 
-        /// </summary>
-        /// <param name="parent">A direct parent of the queried item.</param>
-        /// <typeparam name="T">The type of the queried item.</typeparam>
-        /// <param name="childName">x:Name or Name of child. </param>
-        /// <returns>The first parent item that matches the submitted type parameter. 
-        /// If not matching item can be found, 
-        /// a null parent is being returned.</returns>
-        public static T FindChild<T>(DependencyObject parent, string childName)
-           where T : DependencyObject
-        {
-            // Confirm parent and childName are valid. 
-            if (parent == null) return null;
-
-            T foundChild = null;
-
-            int childrenCount = VisualTreeHelper.GetChildrenCount(parent);
-            for (int i = 0; i < childrenCount; i++)
-            {
-                var child = VisualTreeHelper.GetChild(parent, i);
-                // If the child is not of the request child type child
-                T childType = child as T;
-                if (childType == null)
-                {
-                    // recursively drill down the tree
-                    foundChild = FindChild<T>(child, childName);
-
-                    // If the child is found, break so we do not overwrite the found child. 
-                    if (foundChild != null) break;
-                }
-                else if (!string.IsNullOrEmpty(childName))
-                {
-                    var frameworkElement = child as FrameworkElement;
-                    // If the child's name is set for search
-                    if (frameworkElement != null && frameworkElement.Name == childName)
-                    {
-                        // if the child's name is of the request name
-                        foundChild = (T)child;
-                        break;
-                    }
-                }
-                else
-                {
-                    // child element found.
-                    foundChild = (T)child;
-                    break;
-                }
-            }
-
-            return foundChild;
         }
 
         #endregion

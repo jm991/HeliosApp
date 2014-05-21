@@ -5,6 +5,7 @@ using Windows.UI.Xaml.Navigation;
 using Helios.ViewModel;
 using Windows.Media.Core;
 using Windows.Media.Editing;
+using Windows.UI.Xaml.Controls;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=391641
 
@@ -52,6 +53,9 @@ namespace Helios
             if ((d as MainPage).Vm.MediaSource != null)
             {
                 (d as MainPage).m_player.SetMediaStreamSource((d as MainPage).Vm.MediaSource);
+
+                //(d as MainPage).MyImage.DataContext = (d as MainPage).Vm.Clips[0];
+                //(d as MainPage).MyList.DataContext = (d as MainPage).Vm.Clips;
             }
         }
 
@@ -119,6 +123,11 @@ namespace Helios
             {
                 LastVisit = DateTime.Now
             };
+        }
+
+        private void PageRoot_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
+        {
+            MyList.ReorderMode = MyList.ReorderMode == ListViewReorderMode.Enabled ? ListViewReorderMode.Disabled : ListViewReorderMode.Enabled;
         }
 
         #endregion

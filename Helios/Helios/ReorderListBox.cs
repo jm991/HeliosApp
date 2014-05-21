@@ -184,6 +184,8 @@ namespace Helios
                 this.dragInterceptor.ManipulationStarted += this.dragInterceptor_ManipulationStarted;
                 this.dragInterceptor.ManipulationDelta += this.dragInterceptor_ManipulationDelta;
                 this.dragInterceptor.ManipulationCompleted += this.dragInterceptor_ManipulationCompleted;
+
+                this.scrollViewer.ViewChanged += scrollViewer_ViewChanged;
             }
         }
 
@@ -335,6 +337,22 @@ namespace Helios
         }
 
         /// <summary>
+        /// Called when the scrollViewer completes a view change (code initated scroll).
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void scrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
+        {
+            // If the drag delta hasn't changed, call the scrolling method again in a crude loop
+            // This was needed for the case where the user stops moving their finger (ManipulationDelta isn't called any longer), but the scrolling
+            // still needs to occur (within AutoScroll margins)
+            if (this.dragScrollDelta != 0)
+            {
+                DragScroll(dragScrollDelta);
+            }
+        }
+
+        /// <summary>
         /// Called when the user drags on (or from) the transparent drag-interceptor.
         /// Moves the item (actually a rendered snapshot of the item) according to the drag delta.
         /// </summary>
@@ -344,7 +362,6 @@ namespace Helios
             {
                 return;
             }
-
             if (this.dropTargetIndex == -1)
             {
                 if (this.dragItemContainer == null)
@@ -390,11 +407,12 @@ namespace Helios
                             // are instantly expanded (if they animated, it would be jarring)                
                             if (this.itemsPanel.Children.IndexOf(this.dragItemContainer) < this.itemsPanel.Children.Count - 1)
                             {
-                                // Special casing for if the dragged item is the last in the list
+                                // Special casing for if the dragged item is the last in the list to grab the item behind the dragged one and expanding its DropAfterSpace
                                 this.UpdateDropTarget(Canvas.GetTop(this.dragIndicator) + this.dragIndicator.Height + 1, false);
                             }
                             else
                             {
+                                // Normal case of grabbing the item in front of the dragged one and expanding its DropBeforeSpace
                                 this.UpdateDropTarget(Canvas.GetTop(this.dragIndicator) - 1, false);
                             }
                         }
@@ -592,8 +610,8 @@ namespace Helios
                 double newOffset = this.scrollViewer.VerticalOffset + adjustedDelta;
                 // TODO: changed all of these lines
                 // this.scrollViewer.ScrollToVerticalOffset(newOffset);
-                await Window.Current.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () => { bool offset = this.scrollViewer.ChangeView(null, newOffset, null); });
-                //Debug.WriteLine("scrolled " + newOffset);
+                await Window.Current.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => { bool offset = this.scrollViewer.ChangeView(null, newOffset, null); });
+
 
                 // TODO: replaced this line:
                 // this.Dispatcher.BeginInvoke(() => this.DragScroll());

@@ -82,6 +82,7 @@
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClipToThumbConverter.cs" />
     <Compile Include="ClipToValueConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TimeSpanToValueConverter.cs" />

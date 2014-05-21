@@ -18,6 +18,12 @@
     <Page.Resources>
         <ResourceDictionary>
             <converters:ClipToValueConverter x:Name="clipToValueConverter" />
+            <converters:ClipToThumbConverter x:Name="clipToThumbConverter" />
+            <DataTemplate x:Key="ThumbnailItemTemplate">
+            	<Grid>
+					<Image Tapped="PageRoot_Tapped" Source="{Binding Converter={StaticResource clipToThumbConverter}, ConverterParameter=thumb, Path=UserData}"/>
+				</Grid>
+            </DataTemplate>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Skins/MainSkin.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -36,7 +42,7 @@
                 <VisualState x:Name="Portrait" />
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-
+        
         <!--<controls:Gauge 
 			Value="{Binding ElementName=MySlider, Path=Value}"
             Unit="Trolls"
@@ -59,7 +65,10 @@
 				Position="{Binding LastPosition}"
 				/>
 
-            <TextBlock Opacity="0" Text="{Binding WelcomeTitle}"/>
+            
+			<!--<Image Source="{Binding MyUri}" Width="100" Height="100"/>-->
+            <!--<Image x:Name="MyImage" Width="100" Height="100" Source="{Binding Converter={StaticResource clipToThumbConverter}, ConverterParameter=thumb, Path=UserData}"/>
+			<TextBlock Opacity="0" Text="{Binding WelcomeTitle}"/>-->
 
 
             <StackPanel 
@@ -100,6 +109,8 @@
 					</Button.RenderTransform>
 				</Button>
 			</StackPanel>
+            
+            <ListView x:Name="MyList" Width="100" HorizontalAlignment="Left" ItemsSource="{Binding Clips}" ItemTemplate="{StaticResource ThumbnailItemTemplate}" Foreground="{x:Null}" Background="#73000000"/>
 		</Grid>
     </Grid>
 

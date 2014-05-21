@@ -53,6 +53,11 @@ namespace Helios
 
         #region Private fields
 
+        /// <summary>
+        /// Half pixel bias to settle any double == issues when trying to determine if the dragged item is being dropped
+        /// before or after the ReorderListBox item it's currently above (bias towards before)
+        /// </summary>
+        private const double EPSILON = -0.5d;
         private bool drawn = false;
         private double dragScrollDelta;
         private Panel itemsPanel;
@@ -419,7 +424,7 @@ namespace Helios
                     }
                     catch (ArgumentException error)
                     {
-                        //Debug.WriteLine("Something went wrong with the async bitmap rendering. " + error.ToString());
+                        Debug.WriteLine("Something went wrong with the async bitmap rendering. " + error.ToString());
                     }
 
                     // Since this is all async code, make sure that we haven't already completed the manipulation (and thusly null'd dragItemContainer) by the time the RenderAsync completed
@@ -451,16 +456,19 @@ namespace Helios
                 double y = top + e.Cumulative.Translation.Y;
                 if (y < 0)
                 {
+                    // Special case for dragging to the beginning of the list
                     y = 0;
-                    this.UpdateDropTarget(0, true);
+                    this.UpdateDropTarget(y, true);
                 }
                 else if (y >= this.dragInterceptorRect.Height - dragItemHeight)
                 {
+                    // Special case for dragging to the end of the list
                     y = this.dragInterceptorRect.Height - dragItemHeight;
                     this.UpdateDropTarget(this.dragInterceptorRect.Height - 1, true);
                 }
                 else
                 {
+                    // Normal case of dragging between two items
                     this.UpdateDropTarget(y + dragItemHeight / 2, true);
                 }
 
@@ -639,22 +647,24 @@ namespace Helios
         /// <param name="showTransition">True if the drop-indicator transitions should be shown.</param>
         private void UpdateDropTarget(double dragItemOffset, bool showTransition)
         {
+            // Get a reference to the ReorderListBoxItem at the given offset using the same technique as in ManipulationDelta to
+            // find the drag item
             Point dragPoint = ReorderListBox.GetHostCoordinates(
                 new Point(this.dragInterceptorRect.Left, this.dragInterceptorRect.Top + dragItemOffset));
             IEnumerable<UIElement> targetElements = VisualTreeHelper.FindElementsInHostCoordinates(dragPoint, this.itemsPanel);
             ReorderListBoxItem targetItem = targetElements.OfType<ReorderListBoxItem>().FirstOrDefault();
             if (targetItem != null)
             {
-                //Debug.WriteLine("drop target: " + targetItem.Content);
-
                 GeneralTransform targetTransform = targetItem.DragHandle.TransformToVisual(this.dragInterceptor);
                 Rect targetRect = targetTransform.TransformBounds(new Rect(new Point(0, 0), targetItem.DragHandle.RenderSize));
                 double targetCenter = (targetRect.Top + targetRect.Bottom) / 2;
 
                 int targetIndex = this.itemsPanel.Children.IndexOf(targetItem);
                 int childrenCount = this.itemsPanel.Children.Count;
-                bool after = dragItemOffset > targetCenter;
-
+                // Experiencing some double comparison issues when UpdateDropTarget's dragItemOffset was set to 0 for the 
+                // case of dragging to the beginning/front of the list
+                // So in the dragging to the "beginning" case, an Epsilon value is added to err on the side of !after
+                bool after = dragItemOffset + (targetIndex == 0 ? EPSILON : 0) > targetCenter;
                 ReorderListBoxItem indicatorItem = null;
                 if (!after && targetIndex > 0)
                 {
@@ -672,6 +682,7 @@ namespace Helios
                         indicatorItem = nextItem;
                     }
                 }
+
                 if (indicatorItem == null)
                 {
                     targetItem.DropIndicatorHeight = this.dragIndicator.Height;
@@ -682,6 +693,8 @@ namespace Helios
                     indicatorItem = targetItem;
                 }
 
+                // Animate closing the drag state of nearby items (+-5 from the drop index)
+                // Allows for a flowing effect while dragging
                 for (int i = targetIndex - 5; i <= targetIndex + 5; i++)
                 {
                     if (i >= 0 && i < childrenCount)
